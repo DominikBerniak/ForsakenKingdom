@@ -109,3 +109,73 @@ def menu():
         except ValueError:
             print_error_message("Please enter a number!")
     print_message("Good-bye!")
+
+def create_npc(name,cost_item,amount_items_in_shop):
+    list_items_in_shop = []
+    for i in range(amount_items_in_shop):
+        list_items_in_shop.append(create_item())
+
+    npc = {
+        "icon": "$",
+        "name": name,
+        "cost_item": cost_item,
+        "shop": list_items_in_shop
+    }
+    
+    return npc
+
+def create_torch():
+    torch = {
+        "type" : "key",
+        "name" : "torch",
+        "value": 1
+    }
+    return torch
+
+def create_key():
+    torch = {
+        "type" : "key",
+        "name" : "key",
+        "value": 1
+    }
+    return torch
+
+def create_peter():
+    peter = {
+        "icon": "?",
+        "name":"Peter Iscoming",
+        "quest_description":"You must correct answer to my question",
+        "quest":"What is the name of command to add one or more files to the staging area?",
+        "answer": "git add",
+        "reward": create_torch()
+    }
+    return peter
+
+def create_kate():
+    kate = {
+        "icon": "?",
+        "name": "Kate Antlish",
+        "quest_description": "You must correct answer to my question",
+        "quest": "How reversed string where variable name word?",
+        "answer":"word[::-1]",
+        "reward":create_key()
+    }
+    return kate
+
+def create_adalbert():
+    adalbert = {
+        "icon":"?",
+        "name": "Adalbert Grip",
+        "quest_description": "You must correct answer to my question",
+        "quest": "What is a StackOverflow?",
+        "answer":"error",
+        "reward":create_key()
+    }
+    return adalbert
+
+
+
+
+
+
+
