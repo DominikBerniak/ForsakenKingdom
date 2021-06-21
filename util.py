@@ -31,3 +31,8 @@ def clear_screen():
         os.system('cls')
     else:
         os.system('clear')
+
+def get_input(label):
+    print(label)
+    user_input = input()
+    return user_input
