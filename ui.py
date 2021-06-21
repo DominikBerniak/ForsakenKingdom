@@ -1,11 +1,15 @@
 from os import stat
 from util import clear_screen
 
-def print_message(message):
-    print(f"    {message}")
+def display_message(message, new_lines=0):
+    new_lines = "\n"*new_lines
+    print(f"{new_lines}    {message}")
 
-def print_error_message(message):
+def display_error_message(message):
     print("\n\n    " + message)
+
+def display_title(title):
+    print(f"\n\n    {title}")
 
 def display_board(board):
     '''
@@ -65,10 +69,7 @@ def display_stats(player_stats,board):
     print(first_row)
     print(second_row[:-1])
 
-def display_title(title):
-    print(f"\n\n    {title}")
-
-def print_menu(title, list_options):
+def display_menu(title, list_options):
     display_title(f"   {title}\n")
     for i in range(1,len(list_options)):
         print(f"    ({i}) {list_options[i]}")
@@ -89,4 +90,9 @@ def display_race_choices(races):
         print(f'      {(race_length+1)*" "}{filler}Armor   =  {races[i]["armor"]}')
         if i < len(races)-1:
             print("\n    ============================")
-
+            
+def display_inventory(inventory):
+    clear_screen()
+    display_title("Inventory:\n")
+    for i in range(len(inventory)):
+        display_message(inventory[i],1)

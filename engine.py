@@ -3,6 +3,8 @@ import random
 import util
 import ui
 from main import PLAYER_ICON
+from time import sleep
+
 def create_board(width, height):
   
     '''Creates a new game board based on input parameters.
@@ -22,6 +24,11 @@ def create_board(width, height):
     board.append(horizontal_bottom_board_line)
     return board
 
+def get_player_placement(board):
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if board[i][j] == "@":
+                return i,j
 
 def put_player_on_board(board, player):
     '''
@@ -35,6 +42,11 @@ def put_player_on_board(board, player):
     Nothing
     '''
     pass
+
+def get_confirmation(message):
+    ui.clear_screen()
+    confirmation = util.get_input(message,2).lower()
+    return confirmation in ["yes", "y"]
 
 def random_item_name(type,type_description):
     item = random.choice(type)
@@ -77,65 +89,87 @@ def create_item():
     return item_stats
 
 def authors():
-    crew = ["Dominik Berniak",
-            "Jakub Młocek",
-            "Kordian Płusa",
-            "Dawid Kuropka",
-            "Kewin Gregorczyk"]
-    print(crew)
+    crew = ["Dawid Kuropka     : Full-Stack Developer",
+            "Kewin Gregorczyk  : Full-Stack Developer",
+            "Kordian Płusa     : Full-Stack Developer",
+            "Jakub Młocek      : Full-Stack Developer",
+            "Dominik Berniak   : Full-Stack Developer"]
+    crew_display = ""
+    i = 0
+    x = 0
+    while x in range(len(crew)*2):
+        ui.clear_screen()
+        ui.display_title("            Game authors:\n")
+        if x == 0:
+            crew_display = crew[i]
+        elif x%2 != 0:
+            crew_display = "\n    " + crew_display
+            i+=1
+        else:
+            crew_display = crew[i] + "\n    " + crew_display
+        ui.display_message(crew_display,1)
+        sleep(0.2)
+        x+=1
+    util.press_any_button(3,8)
+    util.clear_screen()
 
 def instruction():
+    ui.clear_screen()
     information = ["Welcome to Roguelike Game ! La Speluna, a company from San Escobar presents.. "]
-    print(information)
+    ui.display_message(information,2)
+    util.press_any_button(2)
+    util.clear_screen()
 
-def display_menu():
-    options = ["Exit program", 
+def hall_of_fame():
+    ui.clear_screen()
+    ui.display_message("Not implemented yet!",2)
+    util.press_any_button(2)
+    util.clear_screen()
+
+def create_menu():
+    options = ["Exit game", 
                "New Game",
                "Hall of Fame",  # optional
                "Authors",
                "Instruction"]
-    ui.print_menu("Main menu", options)
+    ui.display_menu("Main menu", options)
 
 def load_module(option):
     if option == 1:
         #start_game()
-        #return "start_game"
-        pass
+        return "start_game"
     elif option == 2:
-        #hall_of_fame()
-        pass
+        hall_of_fame()
     elif option == 3:
         authors()
-        pass
     elif option == 4:
-        #Instruction()
-        pass
+        instruction()
     elif option == 0:
-        return 0
+        return "quit"
     else:
         raise KeyError()
 
 def menu():
-    option = None
-    while option != '0':
-        display_menu()
+    while True:
+        create_menu()
         try:
             option = util.get_input("Select option",2)
-            load_module(int(option))
-            # option = load_module(int(option))
-            # return option
+            # load_module(int(option))
+            option = load_module(int(option))
+            if option == "start_game" or option == "quit":
+                return option
+
         except KeyError:
             util.clear_screen()
-            ui.print_error_message("There is no such option!\n")
-            util.press_any_button()
+            ui.display_error_message("There is no such option!\n")
+            util.press_any_button(1)
             util.clear_screen()
             
         except ValueError:
             util.clear_screen()
-            ui.print_error_message("Please enter a number!\n")
-            util.press_any_button()
+            ui.display_error_message("Please enter a number!\n")
+            util.press_any_button(1)
             util.clear_screen()
-    ui.print_message("Good-bye!")
 
 def create_npc(name,cost_item,amount_items_in_shop):
     list_items_in_shop = []
@@ -201,13 +235,13 @@ def create_adalbert():
 def do_quest(npc,board):
     #inventory
     util.clear_screen()
-    ui.print_message(npc["name"] + ": "+npc["quest_description"])
-    ui.print_message("You: ")
+    ui.display_message(npc["name"] + ": "+npc["quest_description"])
+    ui.display_message("You: ")
     answer = input(npc["quest"])
     if answer == npc["answer"]:
-        ui.print_message(npc["name"]+": "+"Correct, you got a key!!")
+        ui.display_message(npc["name"]+": "+"Correct, you got a key!!")
     else:
-        ui.print_message(npc["name"]+": "+"uuh, sry you must still learn this")
+        ui.display_message(npc["name"]+": "+"uuh, sry you must still learn this")
     
     if npc["name"] == "peter":
         key = create_torch()
