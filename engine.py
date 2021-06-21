@@ -76,11 +76,24 @@ def create_item():
         item_stats["value"] = random.randint(MIN_GOLD_VALUE,MAX_GOLD_VALUE)
     return item_stats
 
+def authors():
+    crew = ["Dominik Berniak",
+            "Jakub Młocek",
+            "Kordian Płusa",
+            "Dawid Kuropka",
+            "Kewin Gregorczyk"]
+    print(crew)
+
+def instruction():
+    information = ["Welcome to Roguelike Game ! La Speluna, a company from San Escobar presents.. "]
+    print(information)
+
 def display_menu():
     options = ["Exit program",  # zamkniecie pod "q"
                "New Game",
                "Hall of Fame",  # optional
-               "Authors"]
+               "Authors",
+               "Instruction"]
     ui.print_menu("Main menu", options)
 
 def load_module(option):
@@ -91,7 +104,7 @@ def load_module(option):
         #hall_of_fame()
         pass
     elif option == 3:
-        #Authors()
+        authors()
         pass
     elif option == 4:
         #Instruction()
