@@ -1,20 +1,26 @@
 import os
 import random
 from util import clear_screen, get_input
-from ui import print_error_message, print_message
+import ui
 
 def create_board(width, height):
-    '''
-    Creates a new game board based on input parameters.
-
+  
+    '''Creates a new game board based on input parameters.
     Args:
     int: The width of the board
     int: The height of the board
-
     Returns:
     list: Game board
     '''
-    pass
+    board = [[" " for x in range(height)]for y in range(width)]
+    for i in range(len(board)):
+        board[i].insert(0, "|")
+        board[i].append("|")
+    horizontal_top_board_line = ["=" for x in range(len(board[0]))]
+    horizontal_bottom_board_line = ["=" for x in range(len(board[0]))]
+    board.insert(0,horizontal_top_board_line)
+    board.append(horizontal_bottom_board_line)
+    return board
 
 
 def put_player_on_board(board, player):
@@ -47,7 +53,7 @@ def create_item():
 
     item_stats = dict()
     weapons = ["Bow","Warglaive","Staff","Wand","Axe","Sword","Mace","Dagger","Fist","Crossbow"]
-    weapons_description = ["Bloody","Blessed","Cursed","Doom","Big", "Metal" ,"War","Elvies","Small","Holy","Enchantend",""]
+    weapons_description = ["Bloody","Blessed", "Cursed","Doom","Big", "Metal" ,"War","Elvies","Small","Holy","Enchantend",""]
     armor = ["Helmet", "Chest", "Trousers", "Shoes"]
     armor_description = ["Plate","Leather","Mail","Cloth"]
     consumable = ["Ham","Cheese","Elixir","Bread","Water"]
@@ -70,31 +76,30 @@ def create_item():
         item_stats["value"] = random.randint(MIN_GOLD_VALUE,MAX_GOLD_VALUE)
     return item_stats
 
-def print_menu(title, list_options):
-    print(f"\n{title}:\n")
-    for i in range(1,len(list_options)):
-        print(f"({i}) {list_options[i]}")
-    print(f"\n(0) {list_options[0]}\n")
-
-def load_module(option):
-    if option == 1:
-        crm_controller.menu()
-    elif option == 2:
-        sales_controller.menu()
-    elif option == 3:
-        hr_controller.menu()
-    elif option == 0:
-        return 0
-    else:
-        raise KeyError()
-
-
 def display_menu():
     options = ["Exit program",  # zamkniecie pod "q"
                "New Game",
                "Hall of Fame",  # optional
                "Authors"]
-    print_menu("Main menu", options)
+    ui.print_menu("Main menu", options)
+
+def load_module(option):
+    if option == 1:
+        #start_game()
+        pass
+    elif option == 2:
+        #hall_of_fame()
+        pass
+    elif option == 3:
+        #Authors()
+        pass
+    elif option == 4:
+        #Instruction()
+        pass
+    elif option == 0:
+        return 0
+    else:
+        raise KeyError()
 
 def menu():
     option = None
@@ -105,10 +110,10 @@ def menu():
             option = get_input("Select module")
             load_module(int(option))
         except KeyError:
-            print_error_message("There is no such option!")
+            ui.print_error_message("There is no such option!")
         except ValueError:
-            print_error_message("Please enter a number!")
-    print_message("Good-bye!")
+            ui.print_error_message("Please enter a number!")
+    ui.print_message("Good-bye!")
 
 def create_npc(name,cost_item,amount_items_in_shop):
     list_items_in_shop = []
