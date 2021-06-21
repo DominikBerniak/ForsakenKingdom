@@ -9,7 +9,15 @@ def create_board(width, height):
     Returns:
     list: Game board
     '''
-    pass
+    board = [[" " for x in range(height)]for y in range(width)]
+    for i in range(len(board)):
+        board[i].insert(0, "|")
+        board[i].append("|")
+    horizontal_top_board_line = ["=" for x in range(len(board[0]))]
+    horizontal_bottom_board_line = ["=" for x in range(len(board[0]))]
+    board.insert(0,horizontal_top_board_line)
+    board.append(horizontal_bottom_board_line)
+    return board
 
 
 def put_player_on_board(board, player):
