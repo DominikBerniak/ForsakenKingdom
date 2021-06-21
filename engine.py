@@ -205,8 +205,9 @@ def do_quest(npc,board):
     else:
         key = create_key()
     #dodaj do inventory
+    clear_screen()
     ui.display_board(board)
-    return key
+    
 
 board = create_board(10,10)
 ui.display_board(board)
