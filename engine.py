@@ -200,7 +200,7 @@ def create_adalbert():
 
 def do_quest(npc,board):
     #inventory
-    clear_screen()
+    util.clear_screen()
     ui.print_message(npc["name"] + ": "+npc["quest_description"])
     ui.print_message("You: ")
     answer = input(npc["quest"])
@@ -214,7 +214,7 @@ def do_quest(npc,board):
     else:
         key = create_key()
     #dodaj do inventory
-    clear_screen()
+    util.clear_screen()
     ui.display_board(board)
 
 
