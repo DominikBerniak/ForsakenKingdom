@@ -76,11 +76,29 @@ def create_item():
         item_stats["value"] = random.randint(MIN_GOLD_VALUE,MAX_GOLD_VALUE)
     return item_stats
 
+def authors():
+    crew = ["Dominik Berniak",
+            "Jakub Młocek",
+            "Kordian Płusa",
+            "Dawid Kuropka",
+            "Kewin Gregorczyk"]
+    print(crew)
+
+def instruction():
+    information = ["Welcome to Roguelike Game ! La Speluna, a company from San Escobar presents.. "]
+    print(information)
+
 def display_menu():
     options = ["Exit program", 
                "New Game",
+<<<<<<< HEAD
                "Hall of Fame", 
                "Authors"]
+=======
+               "Hall of Fame",  # optional
+               "Authors",
+               "Instruction"]
+>>>>>>> b4d424ee2e66d59e802fd086c61a2592b06e91e7
     ui.print_menu("Main menu", options)
 
 def load_module(option):
@@ -92,7 +110,7 @@ def load_module(option):
         #hall_of_fame()
         pass
     elif option == 3:
-        #Authors()
+        authors()
         pass
     elif option == 4:
         #Instruction()
@@ -123,3 +141,86 @@ def menu():
             util.press_any_button()
             util.clear_screen()
     ui.print_message("Good-bye!")
+
+def create_npc(name,cost_item,amount_items_in_shop):
+    list_items_in_shop = []
+    for i in range(amount_items_in_shop):
+        list_items_in_shop.append(create_item())
+    npc = {
+        "icon": "$",
+        "name": name,
+        "cost_item": cost_item,
+        "shop": list_items_in_shop
+    }
+    return npc
+
+def create_torch():
+    torch = {
+        "type" : "key",
+        "name" : "torch",
+        "value": 1
+    }
+    return torch
+
+def create_key():
+    torch = {
+        "type" : "key",
+        "name" : "key",
+        "value": 1
+    }
+    return torch
+
+def create_peter():
+    peter = {
+        "icon": "?",
+        "name":"Peter Iscoming",
+        "quest_description":"You must correct answer to my question",
+        "quest":"What is the name of command to add one or more files to the staging area?",
+        "answer": "git add",
+        "reward": create_torch()
+    }
+    return peter
+
+def create_kate():
+    kate = {
+        "icon": "?",
+        "name": "Kate Antlish",
+        "quest_description": "You must correct answer to my question",
+        "quest": "How reversed string where variable name word?",
+        "answer":"word[::-1]",
+        "reward":create_key()
+    }
+    return kate
+
+def create_adalbert():
+    adalbert = {
+        "icon":"?",
+        "name": "Adalbert Grip",
+        "quest_description": "You must correct answer to my question",
+        "quest": "What is a StackOverflow? ",
+        "answer":"error",
+        "reward":create_key()
+    }
+    return adalbert
+
+def do_quest(npc,board):
+    #inventory
+    clear_screen()
+    ui.print_message(npc["name"] + ": "+npc["quest_description"])
+    ui.print_message("You: ")
+    answer = input(npc["quest"])
+    if answer == npc["answer"]:
+        ui.print_message(npc["name"]+": "+"Correct, you got a key!!")
+    else:
+        ui.print_message(npc["name"]+": "+"uuh, sry you must still learn this")
+    
+    if npc["name"] == "peter":
+        key = create_torch()
+    else:
+        key = create_key()
+    #dodaj do inventory
+    clear_screen()
+    ui.display_board(board)
+
+
+
