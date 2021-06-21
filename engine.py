@@ -119,14 +119,12 @@ def create_npc(name,cost_item,amount_items_in_shop):
     list_items_in_shop = []
     for i in range(amount_items_in_shop):
         list_items_in_shop.append(create_item())
-
     npc = {
         "icon": "$",
         "name": name,
         "cost_item": cost_item,
         "shop": list_items_in_shop
     }
-    
     return npc
 
 def create_torch():
