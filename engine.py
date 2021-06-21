@@ -91,14 +91,9 @@ def instruction():
 def display_menu():
     options = ["Exit program", 
                "New Game",
-<<<<<<< HEAD
-               "Hall of Fame", 
-               "Authors"]
-=======
                "Hall of Fame",  # optional
                "Authors",
                "Instruction"]
->>>>>>> b4d424ee2e66d59e802fd086c61a2592b06e91e7
     ui.print_menu("Main menu", options)
 
 def load_module(option):
