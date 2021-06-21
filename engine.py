@@ -207,12 +207,6 @@ def do_quest(npc,board):
     #dodaj do inventory
     clear_screen()
     ui.display_board(board)
-    
-
-board = create_board(10,10)
-ui.display_board(board)
-kate = create_kate()
-do_quest(kate,board)
 
 
 
