@@ -183,15 +183,35 @@ def create_adalbert():
         "icon":"?",
         "name": "Adalbert Grip",
         "quest_description": "You must correct answer to my question",
-        "quest": "What is a StackOverflow?",
+        "quest": "What is a StackOverflow? ",
         "answer":"error",
         "reward":create_key()
     }
     return adalbert
 
+def do_quest(npc,board):
+    #inventory
+    clear_screen()
+    ui.print_message(npc["name"] + ": "+npc["quest_description"])
+    ui.print_message("You: ")
+    answer = input(npc["quest"])
+    if answer == npc["answer"]:
+        ui.print_message(npc["name"]+": "+"Correct, you got a key!!")
+    else:
+        ui.print_message(npc["name"]+": "+"uuh, sry you must still learn this")
+    
+    if npc["name"] == "peter":
+        key = create_torch()
+    else:
+        key = create_key()
+    #dodaj do inventory
+    ui.display_board(board)
+    return key
 
-
-
+board = create_board(10,10)
+ui.display_board(board)
+kate = create_kate()
+do_quest(kate,board)
 
 
 
