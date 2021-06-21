@@ -2,55 +2,60 @@ import util
 import engine
 import ui
 import os
-PLAYER_ICON = '@'
-PLAYER_START_X = 3
-PLAYER_START_Y = 3
+from time import sleep
 
-BOARD_WIDTH = 30
-BOARD_HEIGHT = 20
+PLAYER_ICON = '@'
+PLAYER_START_ROW = 3
+PLAYER_START_COL = 3
+
+BOARD_WIDTH = 115
+BOARD_HEIGHT = 30
 
 def console_clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 def create_player():
-    while True:
-        print("""
-        You Can choose your breed:
-        ----------------------------------
-        |Orc=125HP   | Attack:0 | Armor:0|
-        |Human=100HP | Attack:0 | Armor:0|
-        |Dwarf=75HP  | Attack:0 | Armor:0|
-        |Elf=50HP    | Attack:0 | Armor:0|
-        ----------------------------------
-        """)
-        player_stats={"name":input("Give name for your hero: ")}
+    ui.display_title("Create your hero")
+    player_stats = {"name":util.get_input("Your hero's name",1).title()}
+    while True:        
+        orc = {"race":"Orc" ,"health":125,"lvl":1,"exp":0,"attack":7,"armor":20}
+        human = {"race":"Human","health":100,"lvl":1,"exp":0,"attack":10,"armor":10}
+        dwarf = {"race":"Dwarf","health":75,"lvl":1,"exp":0,"attack":10,"armor":20} 
+        elf = {"race":"Elf","health":75,"lvl":1,"exp":0,"attack":13,"armor":10}
+        ui.display_race_choices([orc,human,dwarf,elf])
 
-        orc={"race":"Orc" ,"HP":125,"lvl":1,"xp":0,"attack":5,"armor":50}
-        human={"race":"Human","HP":100,"lvl":1,"xp":0,"attack":10,"armor":45}
-        dwarf={"race":"Dwarf","HP":75,"lvl":1,"xp":0,"attack":10,"armor":55} 
-        elf={"race":"Elf","HP":50,"lvl":3,"xp":0,"attack":7,"armor":5}
-        player_breed=input("Choose race: ").upper()
-
-        if player_breed == "HUMAN":
+        player_race = util.get_input(" Race",3).lower()
+        if player_race == "human":
             player_stats.update(human)
             break
-        elif player_breed == "DWARF":
+        elif player_race == "dwarf":
             player_stats.update(dwarf)
             break
-        elif player_breed == "ELF":
+        elif player_race == "elf":
             player_stats.update(elf)
             break
-        elif player_breed == "ORC":
+        elif player_race == "orc":
             player_stats.update(orc)
             break
         else:
             console_clear()
-            print("CHOOSE YOUR CHARACTER FROM LIST!")
-
+            ui.print_error_message("    Wrong race name!")
+            sleep(2)
+    player_stats.update({"player_location": (PLAYER_START_ROW,PLAYER_START_COL),
+                         "player_icon":PLAYER_ICON})
     return player_stats
 
+def get_player_placement(board):
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if board[i][j] == "@":
+                return i,j
 
 def main():
+    util.clear_screen()
+    # option = engine.menu()
+    #if option == "start_game":
+    util.clear_screen()
     player = create_player()
     board = engine.create_board(BOARD_WIDTH, BOARD_HEIGHT)
 
@@ -59,9 +64,10 @@ def main():
     while is_running:
         engine.put_player_on_board(board, player)
         ui.display_board(board)
+        ui.display_stats(player,board)
 
         key = util.key_pressed()
-        if key == 'q':
+        if key == "q":
             is_running = False
         else:
             pass

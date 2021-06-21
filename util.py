@@ -1,6 +1,6 @@
 import sys
 import os
-
+import time
 
 def key_pressed():
     try:
@@ -32,7 +32,14 @@ def clear_screen():
     else:
         os.system('clear')
 
-def get_input(label):
-    print(label)
-    user_input = input()
+def get_input(label,new_lines):
+    new_lines = "\n" * new_lines
+    user_input = input(f"{new_lines}    {label}: ")
     return user_input
+
+def press_any_button():
+    if os.name == "nt":
+        print("    Press any key to continue . . .")    
+        os.system("pause >nul")
+    else:
+        input("Press enter to continue! ")

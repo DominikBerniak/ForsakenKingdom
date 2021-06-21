@@ -1,16 +1,11 @@
-
-def print_menu(title, list_options):
-    print(f"\n{title}:\n")
-    for i in range(1,len(list_options)):
-        print(f"({i}) {list_options[i]}")
-    print(f"\n(0) {list_options[0]}\n")
+from os import stat
+from util import clear_screen
 
 def print_message(message):
-    print(message)
+    print(f"    {message}")
 
 def print_error_message(message):
-    print("\n" + message)
-    pass
+    print("\n\n    " + message)
 
 def display_board(board):
     '''
@@ -25,8 +20,15 @@ def display_board(board):
         print(row)
 
 def display_stats(player_stats,board):
-    #player_stats.keys = {"name", "race", "health", "lvl", "exp", "attack", "armor"}
+    """
+    player_stats.keys() = {"name", "race", "health", "lvl", "exp", 
+                        "attack", "armor", "player_location", "player_icon"}
+    """
+
     stats = list(player_stats.items())
+    #removing "player_location" and "player_icon"
+    stats = [stats[i] for i in range(len(stats)) if i <7]
+
     for i in range(len(stats)):
         if i <2:
             stats[i] = stats[i][1]
@@ -62,3 +64,29 @@ def display_stats(player_stats,board):
     second_row = left_indent + ' ' *name_race_width + second_row
     print(first_row)
     print(second_row[:-1])
+
+def display_title(title):
+    print(f"\n\n    {title}")
+
+def print_menu(title, list_options):
+    display_title(f"   {title}\n")
+    for i in range(1,len(list_options)):
+        print(f"    ({i}) {list_options[i]}")
+    print(f"\n    (0) {list_options[0]}\n")
+
+def display_race_choices(races):
+    clear_screen()
+    longest_race = 0
+    for i in range(len(races)):
+        if len(races[i]["race"]) > longest_race:
+            longest_race = len(races[i]["race"])
+    print("\n\n    Choose your characters race:")
+    for i in range(len(races)):
+        race_length = len(races[i]["race"])
+        filler = " "*(longest_race-race_length+4)
+        print(f'\n\n      {(race_length+1)*" "}{filler}Health  =  {races[i]["health"]}')
+        print(f'      {races[i]["race"]}:{filler}Attack  =  {races[i]["attack"]}')
+        print(f'      {(race_length+1)*" "}{filler}Armor   =  {races[i]["armor"]}')
+        if i < len(races)-1:
+            print("\n    ============================")
+

@@ -1,8 +1,8 @@
 import os
 import random
-from util import clear_screen, get_input
+import util
 import ui
-
+from main import PLAYER_ICON
 def create_board(width, height):
   
     '''Creates a new game board based on input parameters.
@@ -12,7 +12,7 @@ def create_board(width, height):
     Returns:
     list: Game board
     '''
-    board = [[" " for x in range(height)]for y in range(width)]
+    board = [[" " for x in range(width)]for y in range(height)]
     for i in range(len(board)):
         board[i].insert(0, "|")
         board[i].append("|")
@@ -77,15 +77,16 @@ def create_item():
     return item_stats
 
 def display_menu():
-    options = ["Exit program",  # zamkniecie pod "q"
+    options = ["Exit program", 
                "New Game",
-               "Hall of Fame",  # optional
+               "Hall of Fame", 
                "Authors"]
     ui.print_menu("Main menu", options)
 
 def load_module(option):
     if option == 1:
         #start_game()
+        #return "start_game"
         pass
     elif option == 2:
         #hall_of_fame()
@@ -104,13 +105,21 @@ def load_module(option):
 def menu():
     option = None
     while option != '0':
-        clear_screen()
         display_menu()
         try:
-            option = get_input("Select module")
+            option = util.get_input("Select option",2)
             load_module(int(option))
+            # option = load_module(int(option))
+            # return option
         except KeyError:
-            ui.print_error_message("There is no such option!")
+            util.clear_screen()
+            ui.print_error_message("There is no such option!\n")
+            util.press_any_button()
+            util.clear_screen()
+            
         except ValueError:
-            ui.print_error_message("Please enter a number!")
+            util.clear_screen()
+            ui.print_error_message("Please enter a number!\n")
+            util.press_any_button()
+            util.clear_screen()
     ui.print_message("Good-bye!")
