@@ -87,6 +87,16 @@ def put_door_on_board(board,door_icon):
         if i < len(board)-1:
             board[i+1][exit_door_row][exit_door_col] = "O" #open door
 
+def put_npc_shop_on_board(board,NPC_SHOP_ICON):
+    for i in range(len(board)):
+        npc_row = random.randint(1, len(board[i])-2)
+        npc_col = random.randint(1, len(board[i][0])-2)
+        while not is_unoccupied(board[i],npc_row,npc_col):
+            npc_row = random.randint(1, len(board[i])-2)
+            npc_col = random.randint(1, len(board[i][0])-2)
+        board[i][npc_row][npc_col] = NPC_SHOP_ICON
+        
+
 def get_confirmation(message):
     confirmation = util.get_input(message,2).lower()
     return confirmation in ["yes", "y"]

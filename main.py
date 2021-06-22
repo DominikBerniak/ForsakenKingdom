@@ -8,6 +8,7 @@ PLAYER_ICON = '@'
 CLOSED_DOOR_ICON = 'X'
 OPEN_EXIT_DOOR_ICON = 'O'
 NPC_SHOP_ICON = '$'
+NPC_QUEST_ICON = "?"
 
 PLAYER_START_ROW = 5
 PLAYER_START_COL = 100
@@ -74,6 +75,7 @@ def main():
         player = create_player()
         board = [engine.create_board(BOARD_WIDTH, BOARD_HEIGHT),engine.create_board(BOARD_WIDTH, BOARD_HEIGHT),engine.create_board(BOARD_WIDTH, BOARD_HEIGHT)]
         engine.put_door_on_board(board,CLOSED_DOOR_ICON)
+        engine.put_npc_shop_on_board(board,NPC_SHOP_ICON)
         board_level = 0
 
 
