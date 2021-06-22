@@ -70,17 +70,18 @@ def create_item():
     armor_description = ["Plate","Leather","Mail","Cloth"]
     consumable = ["Ham","Cheese","Elixir","Bread","Water"]
     consumable_description = ["Stinky","Tasty","Godlike"]
-    type = ["weapons","weapons","weapons","armor","armor","consumable","gold"]
+    type = ["Weapons","Weapons","Weapons","Armor","Armor","Health","Gold"]
 
     randomized_type = random.choice(type)
     item_stats["type"] = randomized_type
-    if randomized_type == "weapons":
+    if randomized_type == "Weapons":
         item_stats["name"] = random_item_name(weapons,weapons_description)
+        item_stats["type"] = "Attack"
         item_stats["value"] = random.randint(MIN_ATTACK_VALUE,MAX_ATTACK_VALUE)
-    elif randomized_type == "armor":
+    elif randomized_type == "Armor":
         item_stats["name"] = random_item_name(armor,armor_description)
         item_stats["value"] = random.randint(MIN_ARMOR_VALUE,MAX_ARMOR_VALUE)
-    elif randomized_type == "consumable":
+    elif randomized_type == "Health":
         item_stats["name"] = random_item_name(consumable,consumable_description)
         item_stats["value"] = random.randint(MIN_CONSUMABLE_VALUE,MAX_CONSUMABLE_VALUE)
     else:
@@ -185,16 +186,16 @@ def create_npc(name,cost_item,amount_items_in_shop):
 
 def create_torch():
     torch = {
-        "type" : "key",
-        "name" : "torch",
+        "type" : "Key",
+        "name" : "Torch",
         "value": 1
     }
     return torch
 
 def create_key():
     torch = {
-        "type" : "key",
-        "name" : "key",
+        "type" : "Key",
+        "name" : "Key",
         "value": 1
     }
     return torch
@@ -224,7 +225,7 @@ def create_kate():
 def create_adalbert():
     adalbert = {
         "icon":"?",
-        "name": "Adalbert Grip",
+        "name": "Adalbert Gribbs",
         "quest_description": "You must correct answer to my question",
         "quest": "What is a StackOverflow? ",
         "answer":"error",
@@ -232,8 +233,7 @@ def create_adalbert():
     }
     return adalbert
 
-def do_quest(npc,board):
-    #inventory
+def do_quest(npc,board,player):
     util.clear_screen()
     ui.display_message(npc["name"] + ": "+npc["quest_description"])
     ui.display_message("You: ")
@@ -243,13 +243,22 @@ def do_quest(npc,board):
     else:
         ui.display_message(npc["name"]+": "+"uuh, sry you must still learn this")
     
-    if npc["name"] == "peter":
-        key = create_torch()
-    else:
-        key = create_key()
-    #dodaj do inventory
+    util.press_any_button()
+    reward = npc["reward"]
+
+    add_to_inventory(player,reward)
     util.clear_screen()
     ui.display_board(board)
 
+def add_to_inventory(player, added_items):
+    inventory = player["inventory"]
+    is_in_inventory = False
+    for items in inventory:
+        if items["name"] == added_items["name"]:
+            items["value"] += added_items["value"]
+            is_in_inventory = True
+    if not is_in_inventory:
+        inventory.append(added_items)
 
-
+def remove_from_inventory(inventory, removed_items):
+    pass
