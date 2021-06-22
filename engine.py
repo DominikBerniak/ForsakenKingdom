@@ -252,4 +252,16 @@ def do_quest(npc,board):
     ui.display_board(board)
 
 
+def create_enemy(player_level):
+    #format MARKER, ATK, MIN HP, MAX HP, ARMOR, EXP
+    current_enemy = []
+    enemies = {"Skeleton":["╥",10,5,50,75, 10], "Ghoul":["╓",20,15,50,5,15], "Boar":["╖", 10, 50, 200,40,25], "Spider":["╫", 15,10,50,20,15],"Ghost":["░",3,1,5,100,5], "Ogre":["V",25,20,75,100,75]}
+    random_enemy = random.choice(list(enemies.items()))
+    marker,atack, min_hp, max_hp, armor, exp = random_enemy[1]
+    if player_level < 5: 
+        max_hp = max_hp//2
+        armor = armor//2 
+    enemy = {"Name": random_enemy[0]},{"Enemy icon":marker},{"Atack":atack},{"Minimum HP": min_hp},{"Maximum HP":max_hp},{"Armor": armor},{"Experience":exp}
+    return enemy
+
 
