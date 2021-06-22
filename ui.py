@@ -1,4 +1,3 @@
-from os import stat
 from util import clear_screen
 
 def display_message(message, new_lines=0):
@@ -92,7 +91,20 @@ def display_race_choices(races):
             print("\n    ============================")
             
 def display_inventory(inventory):
+    # inventory = [{'type': str, 'name': str, 'value': int}, ...]
+    inventory = sorted(inventory, key=lambda x: x["type"])
+    longest_name = 0
+    longest_type = 0 
+    for i in range(len(inventory)):
+        if len(inventory[i]["name"]) > longest_name:
+            longest_name = len(inventory[i]["name"])
+        elif len(inventory[i]["type"]) > longest_type:
+            longest_type = len(inventory[i]["type"])
     clear_screen()
     display_title("Inventory:\n")
     for i in range(len(inventory)):
-        display_message(list(inventory)[i],1)
+        name_lenght = len(inventory[i]["name"])
+        type_lenght = len(inventory[i]["type"])
+        filler_name = (longest_name - name_lenght + 2)*" "
+        filler_type = (longest_type - type_lenght + 2)*" "
+        display_message(f"{inventory[i]['name']}{filler_name}:  {inventory[i]['type']}{filler_type}=  {inventory[i]['value']}",1)
