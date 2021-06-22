@@ -30,7 +30,7 @@ def display_stats(player_stats,board):
     """
 
     stats = list(player_stats.items())
-    #removing "player_location" and "player_icon"
+    #removing "player_location" and "player_icon" and "inventory"
     stats = [stats[i] for i in range(len(stats)) if i <7]
 
     for i in range(len(stats)):
@@ -95,4 +95,4 @@ def display_inventory(inventory):
     clear_screen()
     display_title("Inventory:\n")
     for i in range(len(inventory)):
-        display_message(inventory[i],1)
+        display_message(list(inventory)[i],1)

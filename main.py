@@ -18,7 +18,7 @@ def create_player():
         player_stats = {"name":util.get_input("Your hero's name",1).title()}
         if player_stats["name"] == "Admin":
             player_stats.update({"race":"God" ,"health":1000000,"lvl":1000000,"exp":1000000,"attack":1000000,
-                                "armor":1000000,"player_location": [PLAYER_START_ROW,PLAYER_START_COL],"player_icon":PLAYER_ICON})
+                                "armor":1000000,"player_location": [PLAYER_START_ROW,PLAYER_START_COL],"player_icon":PLAYER_ICON, "inventory":{}})
             return player_stats
         while True:        
             orc = {"race":"Orc" ,"health":125,"lvl":1,"exp":0,"attack":7,"armor":20}
@@ -45,7 +45,7 @@ def create_player():
                 ui.display_error_message("    Wrong race name!")
                 sleep(2)      
         player_stats.update({"player_location": [PLAYER_START_ROW,PLAYER_START_COL],
-                                "player_icon":PLAYER_ICON})
+                                "player_icon":PLAYER_ICON, "inventory": {}})
 
         if engine.get_confirmation(f"""You've created {player_stats["name"]}, the {player_stats["race"]}.
     
@@ -60,14 +60,13 @@ def quit():
     ui.clear_screen()
 
 def main():
-    inventory = ["sword", "cos", "kot", "kitek"]
     util.clear_screen()
     option = engine.menu()
     if option == "start_game":
         util.clear_screen()
         player = create_player()
         board = engine.create_board(BOARD_WIDTH, BOARD_HEIGHT)
-
+        player["inventory"].update({"sword":10, "helmet": 10, "torch": 1})
         util.clear_screen()
         while True:
             util.clear_screen()
@@ -88,7 +87,7 @@ def main():
             elif key == "d":
                 player["player_location"][1] += 1 
             elif key == "i":
-                ui.display_inventory(inventory)
+                ui.display_inventory(player["inventory"])
                 util.press_any_button(4)
             
             
