@@ -1,8 +1,6 @@
-import os
 import random
 import util
 import ui
-from main import PLAYER_ICON
 from time import sleep
 
 def create_board(width, height):

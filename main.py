@@ -18,7 +18,7 @@ def create_player():
         player_stats = {"name":util.get_input("Your hero's name",1).title()}
         if player_stats["name"] == "Admin":
             player_stats.update({"race":"God" ,"health":1000000,"lvl":1000000,"exp":1000000,"attack":1000000,
-                                "armor":1000000,"player_location": [PLAYER_START_ROW,PLAYER_START_COL],"player_icon":PLAYER_ICON, "inventory":{}})
+                                "armor":1000000,"player_location": [PLAYER_START_ROW,PLAYER_START_COL],"player_icon":PLAYER_ICON, "inventory":[]})
             return player_stats
         while True:        
             orc = {"race":"Orc" ,"health":125,"lvl":1,"exp":0,"attack":7,"armor":20}
@@ -45,7 +45,7 @@ def create_player():
                 ui.display_error_message("    Wrong race name!")
                 sleep(2)      
         player_stats.update({"player_location": [PLAYER_START_ROW,PLAYER_START_COL],
-                                "player_icon":PLAYER_ICON, "inventory": {}})
+                                "player_icon":PLAYER_ICON, "inventory": []})
 
         if engine.get_confirmation(f"""You've created {player_stats["name"]}, the {player_stats["race"]}.
     
@@ -66,7 +66,10 @@ def main():
         util.clear_screen()
         player = create_player()
         board = engine.create_board(BOARD_WIDTH, BOARD_HEIGHT)
-        player["inventory"].update({"sword":10, "helmet": 10, "torch": 1})
+
+        player["inventory"].extend([{'type': 'armor', 'name': 'Mail Shoes', 'value': 1}, {'type': 'gold', 'name': 'Gold', 'value': 8},
+        {'type': 'consumable', 'name': 'Godlike Cheese', 'value': 29},{'type': 'armor', 'name': 'Chain Chestplate', 'value': 2}])
+
         util.clear_screen()
         while True:
             util.clear_screen()
