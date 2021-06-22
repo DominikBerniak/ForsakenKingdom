@@ -65,7 +65,8 @@ def main():
     if option == "start_game":
         util.clear_screen()
         player = create_player()
-        board = engine.create_board(BOARD_WIDTH, BOARD_HEIGHT)
+        board = [engine.create_board(BOARD_WIDTH, BOARD_HEIGHT),engine.create_board(BOARD_WIDTH, BOARD_HEIGHT),engine.create_board(BOARD_WIDTH, BOARD_HEIGHT)]
+        board_level = 0
 
         player["inventory"].extend([{'type': 'armor', 'name': 'Mail Shoes', 'value': 1}, {'type': 'gold', 'name': 'Gold', 'value': 8},
         {'type': 'consumable', 'name': 'Godlike Cheese', 'value': 29},{'type': 'armor', 'name': 'Chain Chestplate', 'value': 2}])
@@ -73,21 +74,22 @@ def main():
         util.clear_screen()
         while True:
             util.clear_screen()
-            engine.put_player_on_board(board, player)
-            ui.display_board(board)
-            ui.display_stats(player,board)
+            engine.put_player_on_board(board[board_level], player)
+            ui.display_board(board[board_level])
+            ui.display_stats(player,board[board_level])
+            player_location_row, player_location_col = player["player_location"]
 
             key = util.key_pressed()
             if key == "`":
                 if engine.get_confirmation("Do you really want to quit the game? (yes/no)"):
                     return quit()
-            elif key == "w":
+            elif key == "w" and engine.is_unoccupied(board[board_level], player_location_row-1, player_location_col):
                 player["player_location"][0] -= 1 
-            elif key == "s":
+            elif key == "s" and engine.is_unoccupied(board[board_level], player_location_row+1, player_location_col):
                 player["player_location"][0] += 1 
-            elif key == "a":
+            elif key == "a" and engine.is_unoccupied(board[board_level], player_location_row, player_location_col-1):
                 player["player_location"][1] -= 1 
-            elif key == "d":
+            elif key == "d" and engine.is_unoccupied(board[board_level], player_location_row, player_location_col+1):
                 player["player_location"][1] += 1 
             elif key == "i":
                 ui.display_inventory(player["inventory"])
