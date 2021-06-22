@@ -20,6 +20,7 @@ def display_board(board):
     print("\n")
     for i in range(len(board)):
         row = "    " + "".join(board[i])
+        row = row.replace("O", " ")
         print(row)
 
 def display_stats(player_stats,board):

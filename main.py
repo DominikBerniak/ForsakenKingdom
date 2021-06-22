@@ -5,11 +5,16 @@ import os
 from time import sleep
 
 PLAYER_ICON = '@'
-PLAYER_START_ROW = 3
-PLAYER_START_COL = 3
+CLOSED_DOOR_ICON = 'X'
+OPEN_EXIT_DOOR_ICON = 'O'
+PLAYER_START_ROW = 5
+PLAYER_START_COL = 100
 
 BOARD_WIDTH = 115
 BOARD_HEIGHT = 30
+
+
+
 
 def create_player():
     while True:
@@ -46,7 +51,7 @@ def create_player():
                 sleep(2)      
         player_stats.update({"player_location": [PLAYER_START_ROW,PLAYER_START_COL],
                                 "player_icon":PLAYER_ICON, "inventory": []})
-
+        ui.clear_screen()
         if engine.get_confirmation(f"""You've created {player_stats["name"]}, the {player_stats["race"]}.
     
     Do you want to play as {player_stats["name"]}? (yes/no)"""):
@@ -66,7 +71,9 @@ def main():
         util.clear_screen()
         player = create_player()
         board = [engine.create_board(BOARD_WIDTH, BOARD_HEIGHT),engine.create_board(BOARD_WIDTH, BOARD_HEIGHT),engine.create_board(BOARD_WIDTH, BOARD_HEIGHT)]
+        engine.put_door_on_board(board,CLOSED_DOOR_ICON)
         board_level = 0
+
 
         player["inventory"].extend([{'type': 'armor', 'name': 'Mail Shoes', 'value': 1}, {'type': 'gold', 'name': 'Gold', 'value': 8},
         {'type': 'consumable', 'name': 'Godlike Cheese', 'value': 29},{'type': 'armor', 'name': 'Chain Chestplate', 'value': 2}])
@@ -81,20 +88,36 @@ def main():
 
             key = util.key_pressed()
             if key == "`":
+                ui.clear_screen()
                 if engine.get_confirmation("Do you really want to quit the game? (yes/no)"):
                     return quit()
-            elif key == "w" and engine.is_unoccupied(board[board_level], player_location_row-1, player_location_col):
+            elif key == "w" and engine.is_not_wall(board[board_level], player_location_row-1, player_location_col,CLOSED_DOOR_ICON):
                 player["player_location"][0] -= 1 
-            elif key == "s" and engine.is_unoccupied(board[board_level], player_location_row+1, player_location_col):
+            elif key == "s" and engine.is_not_wall(board[board_level], player_location_row+1, player_location_col,CLOSED_DOOR_ICON):
                 player["player_location"][0] += 1 
-            elif key == "a" and engine.is_unoccupied(board[board_level], player_location_row, player_location_col-1):
+            elif key == "a" and engine.is_not_wall(board[board_level], player_location_row, player_location_col-1,CLOSED_DOOR_ICON):
                 player["player_location"][1] -= 1 
-            elif key == "d" and engine.is_unoccupied(board[board_level], player_location_row, player_location_col+1):
+            elif key == "d" and engine.is_not_wall(board[board_level], player_location_row, player_location_col+1,CLOSED_DOOR_ICON):
                 player["player_location"][1] += 1 
             elif key == "i":
                 ui.display_inventory(player["inventory"])
                 util.press_any_button(4)
-            
+
+            #Changing board level
+            player_location_row, player_location_col = player["player_location"]
+            board_walls = {"rows": [0, len(board[board_level])-1], "cols": [0, len(board[board_level][0])-1]}
+            if player_location_row in board_walls["rows"] or player_location_col in board_walls["cols"]:
+                if board_level == 0:
+                    player["player_location"] = engine.player_location_after_door(board[board_level],player_location_row,player_location_col)
+                    board_level = 1
+                else:
+                    if board[board_level][player_location_row][player_location_col] == OPEN_EXIT_DOOR_ICON:
+                        player["player_location"] = engine.player_location_after_door(board[board_level],player_location_row,player_location_col)
+                        board_level -= 1
+                    else:
+                        player["player_location"] = engine.player_location_after_door(board[board_level],player_location_row,player_location_col)
+                        board_level += 1
+
             
     elif option == "quit":
         quit()

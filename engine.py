@@ -25,6 +25,10 @@ def create_board(width, height):
 def is_unoccupied(board,row,col):
     return board[row][col] == " "
 
+def is_not_wall(board, row, col,door_icon):
+    return (board[row][col] != "=" and board[row][col] != "|" 
+            and board[row][col] != door_icon)
+
 def get_player_placement(board):
     for i in range(len(board)):
         for j in range(len(board[0])):
@@ -48,8 +52,42 @@ def put_player_on_board(board, player):
     player_row, player_col, player_icon = player["player_location"][0],player["player_location"][1], player["player_icon"]
     board[player_row][player_col] = player_icon
 
+def player_location_after_door(board,player_location_row,player_location_col):
+    if player_location_row == 0:
+        player_location_row = len(board)-2
+    elif player_location_row == len(board)-1:
+        player_location_row = 1
+    elif player_location_col == 0:
+        player_location_col = len(board[0])-2
+    elif player_location_col == len(board[0])-1:
+        player_location_col = 1
+    return [player_location_row,player_location_col]
+    
+def get_next_level_old_door_location(board,row,col):
+    if row == 0:
+        row = len(board)-1
+    elif row == len(board)-1:
+        row = 0
+    elif col == 0:
+        col = len(board[0])-1
+    elif col == len(board[0])-1:
+        col = 0
+    return [row,col]
+
+def put_door_on_board(board,door_icon):
+    for i in range(len(board)):
+        enter_door_row = random.randint(0, len(board[i])-1)
+        if enter_door_row in [0, len(board[i])-1]:
+            enter_door_col = random.choice([1,len(board[i][0])-2])
+        else:
+            enter_door_col = random.choice([0, len(board[i][0])-1])
+        if i < len(board)-1:
+            board[i][enter_door_row][enter_door_col] = " " #door_icon
+        exit_door_row, exit_door_col = get_next_level_old_door_location(board[0], enter_door_row, enter_door_col)
+        if i < len(board)-1:
+            board[i+1][exit_door_row][exit_door_col] = "O" #open door
+
 def get_confirmation(message):
-    ui.clear_screen()
     confirmation = util.get_input(message,2).lower()
     return confirmation in ["yes", "y"]
 
