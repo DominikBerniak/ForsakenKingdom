@@ -1,8 +1,6 @@
-import os
 import random
 import util
 import ui
-from main import PLAYER_ICON
 from time import sleep
 
 def create_board(width, height):
@@ -24,6 +22,9 @@ def create_board(width, height):
     board.append(horizontal_bottom_board_line)
     return board
 
+def is_unoccupied(board,row,col):
+    return board[row][col] == " "
+
 def get_player_placement(board):
     for i in range(len(board)):
         for j in range(len(board[0])):
@@ -41,7 +42,11 @@ def put_player_on_board(board, player):
     Returns:
     Nothing
     '''
-    pass
+    cords = get_player_placement(board)
+    if cords:
+        board[cords[0]][cords[1]] = " "
+    player_row, player_col, player_icon = player["player_location"][0],player["player_location"][1], player["player_icon"]
+    board[player_row][player_col] = player_icon
 
 def get_confirmation(message):
     ui.clear_screen()
