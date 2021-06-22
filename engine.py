@@ -55,9 +55,9 @@ def get_confirmation(message):
 def random_item_name(type,type_description):
     item = random.choice(type)
     description_item = random.choice(type_description)
-    return description_item+" "+item
+    return (description_item+" "+item).strip()
 
-def create_item():
+def create_item(is_shop=False):
     MIN_ATTACK_VALUE = 1
     MAX_ATTACK_VALUE = 10
     MIN_ARMOR_VALUE = 1
@@ -74,7 +74,10 @@ def create_item():
     armor_description = ["Plate","Leather","Mail","Cloth"]
     consumable = ["Ham","Cheese","Elixir","Bread","Water"]
     consumable_description = ["Stinky","Tasty","Godlike"]
-    type = ["Weapons","Weapons","Weapons","Armor","Armor","Health","Gold"]
+    if not is_shop:
+        type = ["Weapons","Weapons","Weapons","Armor","Armor","Health","Gold"]
+    else:
+        type = ["Weapons","Weapons","Weapons","Armor","Armor","Health","Health"]
 
     randomized_type = random.choice(type)
     item_stats["type"] = randomized_type
@@ -120,7 +123,7 @@ def authors():
 
 def instruction():
     ui.clear_screen()
-    information =  """Preparation for the game:",
+    information = """Preparation for the game:",
                 "First you need to create a character. Choose the races responsibly! 
                 "Each race has different stats. The character is moved by W/S/A/D. Also \"W\" is
                 "to attacking. 
@@ -272,6 +275,14 @@ def add_to_inventory(player, added_items):
     if not is_in_inventory:
         inventory.append(added_items)
 
+def update_gold_in_inventory(inventory,amount_of_gold):
+    for index in range(len(inventory)):
+        if inventory[index]["name"] == "Gold":
+            if inventory[index]["value"] + amount_of_gold < 0:
+                raise ValueError
+            else:
+                inventory[index]["value"] += amount_of_gold
+
 def sell_from_inventory(player,board):
     util.clear_screen()
     unsold_items = ["gold","torch","key"]
@@ -287,16 +298,11 @@ def sell_from_inventory(player,board):
             index += 1
         try:
             del player["inventory"][index]
-            gold = {
-                "type" : "Gold",
-                "name" : "Gold",
-                "value": 10
-                }
-            add_to_inventory(player,gold)
+            update_gold_in_inventory(player["inventory"],10)
             util.clear_screen()
             ui.display_inventory(player["inventory"])
         except IndexError:
-            ui.display_error_message(f"You don't have this item")
+            ui.display_error_message(f"You don't have {name_item_to_sell.title()}")
         
         if get_confirmation("Wanna sell somthing else?"):
             util.clear_screen()
@@ -305,5 +311,35 @@ def sell_from_inventory(player,board):
     ui.display_board(board)
 
 def buy_from_shop(player,board,npc):
-    pass
+    util.clear_screen()
+    shop = npc["shop"]
+    while True:
+        ui.display_inventory(shop)
+        index = 0
+        name_item_to_buy = util.get_input("Want you buy something?").lower()
+        for item in shop:
+                if name_item_to_buy == item["name"].lower():
+                    break
+                index += 1
+        try:
+            add_to_inventory(player,shop[index])
+            del shop[index]
+            gold = {
+                "type" : "Gold",
+                "name" : "Gold",
+                "value": -(npc["cost_item"])
+                }
+            update_gold_in_inventory(player["inventory"],-(npc["cost_item"]))
+            util.clear_screen()
+            ui.display_inventory(player["inventory"])
+        except IndexError:
+            ui.display_error_message(f"I don't have {name_item_to_buy.title()}")
+        except ValueError:
+            ui.display_error_message(f"You don't have money to buy this")
+
+        if get_confirmation("Wanna buy somthing else?"):
+            util.clear_screen()
+        else:
+            break
+    ui.display_board(board)
     

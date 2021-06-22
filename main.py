@@ -69,7 +69,7 @@ def main():
         board = [engine.create_board(BOARD_WIDTH, BOARD_HEIGHT),engine.create_board(BOARD_WIDTH, BOARD_HEIGHT),engine.create_board(BOARD_WIDTH, BOARD_HEIGHT)]
         board_level = 0
 
-        player["inventory"].extend([{'type': 'armor', 'name': 'Mail Shoes', 'value': 1}, {'type': 'gold', 'name': 'Gold', 'value': 8},
+        player["inventory"].extend([{'type': 'armor', 'name': 'Mail Shoes', 'value': 1}, {'type': 'gold', 'name': 'Gold', 'value': 21},
         {'type': 'consumable', 'name': 'Godlike Cheese', 'value': 29},{'type': 'armor', 'name': 'Chain Chestplate', 'value': 2}])
 
         util.clear_screen()
@@ -96,6 +96,7 @@ def main():
                 ui.display_inventory(player["inventory"])
                 util.press_any_button(4)
             elif key =="p":
+                npc = engine.create_npc("Hilary Pilton",15,6)
                 engine.sell_from_inventory(player,board[board_level])
             
     elif option == "quit":
