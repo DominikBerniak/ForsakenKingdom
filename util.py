@@ -44,4 +44,8 @@ def press_any_button(new_lines = 0,indent=4):
         os.system("pause >nul")
     else:
         input(f"{new_lines}Press enter to continue! ")
+
+def get_confirmation(message):
+    confirmation = get_input(message,2).lower()
+    return confirmation in ["yes", "y"]
         
