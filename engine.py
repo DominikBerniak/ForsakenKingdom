@@ -95,7 +95,19 @@ def put_npc_shop_on_board(board,NPC_SHOP_ICON):
             npc_row = random.randint(1, len(board[i])-2)
             npc_col = random.randint(1, len(board[i][0])-2)
         board[i][npc_row][npc_col] = NPC_SHOP_ICON
-        
+
+def put_enemy_on_board(board,enemy_icon):
+    for i in range(len(board)):
+        number_of_enemies = random.randint(10,15)
+        while number_of_enemies > 0:
+            npc_row = random.randint(1, len(board[i])-2)
+            npc_col = random.randint(1, len(board[i][0])-2)
+            while not is_unoccupied(board[i],npc_row,npc_col):
+                npc_row = random.randint(1, len(board[i])-2)
+                npc_col = random.randint(1, len(board[i][0])-2)
+            board[i][npc_row][npc_col] = enemy_icon
+            number_of_enemies -= 1
+
 
 def get_confirmation(message):
     confirmation = util.get_input(message,2).lower()
