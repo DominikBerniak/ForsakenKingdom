@@ -10,6 +10,7 @@ OPEN_EXIT_DOOR_ICON = 'O'
 NPC_SHOP_ICON = '$'
 NPC_QUEST_ICON = "?"
 ENEMY_ICON = 'T'
+ITEM_ICON = '&'
 
 PLAYER_START_ROW = 5
 PLAYER_START_COL = 100
@@ -33,6 +34,7 @@ def main():
         engine.put_door_on_board(board,CLOSED_DOOR_ICON)
         engine.put_npc_shop_on_board(board,NPC_SHOP_ICON)
         engine.put_enemy_on_board(board,ENEMY_ICON)
+        engine.put_item_on_board(board,ITEM_ICON)
         board_level = 0
 
 
@@ -56,25 +58,25 @@ def main():
                 if engine.is_unoccupied(board[board_level],player_location_row-1,player_location_col):
                     player["player_location"][0] -= 1
                 else:
-                    player["player_location"][0] -= engine.encounter(board[board_level], player,player_location_row-1,player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON)
+                    player["player_location"][0] -= engine.encounter(board[board_level], player,player_location_row-1,player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON)
 
             elif key == "s" and engine.is_not_wall(board[board_level], player_location_row+1, player_location_col,CLOSED_DOOR_ICON):
                 if engine.is_unoccupied(board[board_level],player_location_row+1,player_location_col):
                     player["player_location"][0] += 1
                 else:
-                    player["player_location"][0] += engine.encounter(board[board_level], player,player_location_row+1, player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON)
+                    player["player_location"][0] += engine.encounter(board[board_level], player,player_location_row+1, player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON)
 
             elif key == "a" and engine.is_not_wall(board[board_level], player_location_row, player_location_col-1,CLOSED_DOOR_ICON):
                 if engine.is_unoccupied(board[board_level],player_location_row,player_location_col-1):
                     player["player_location"][1] -= 1 
                 else:
-                    player["player_location"][1] -= engine.encounter(board[board_level], player,player_location_row,player_location_col-1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON) 
+                    player["player_location"][1] -= engine.encounter(board[board_level], player,player_location_row,player_location_col-1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON) 
 
             elif key == "d" and engine.is_not_wall(board[board_level], player_location_row, player_location_col+1,CLOSED_DOOR_ICON):
                 if engine.is_unoccupied(board[board_level],player_location_row,player_location_col+1):
                     player["player_location"][1] += 1 
                 else:
-                    player["player_location"][1] += engine.encounter(board[board_level], player,player_location_row,player_location_col+1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON) 
+                    player["player_location"][1] += engine.encounter(board[board_level], player,player_location_row,player_location_col+1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON) 
 
             elif key == "i":
                 ui.display_inventory(player["inventory"])
