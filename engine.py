@@ -120,7 +120,7 @@ def authors():
 
 def instruction():
     ui.clear_screen()
-    information = = """Preparation for the game:",
+    information =  """Preparation for the game:",
                 "First you need to create a character. Choose the races responsibly! 
                 "Each race has different stats. The character is moved by W/S/A/D. Also \"W\" is
                 "to attacking. 
