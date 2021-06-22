@@ -109,3 +109,7 @@ def display_inventory(inventory):
         filler_name = (longest_name - name_lenght + 2)*" "
         filler_type = (longest_type - type_lenght + 2)*" "
         display_message(f"{inventory[i]['name']}{filler_name}:  {inventory[i]['type']}{filler_type}=  {inventory[i]['value']}",1)
+
+
+"""ASCI ART"""
+
