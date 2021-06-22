@@ -343,7 +343,7 @@ def update_gold_in_inventory(inventory,amount_of_gold):
                 raise ValueError
             else:
                 inventory[index]["value"] += amount_of_gold
-                
+
 def create_enemy(player_level):
     #format MARKER, ATK, MIN HP, MAX HP, ARMOR, EXP
     current_enemy = []
@@ -415,4 +415,12 @@ def buy_from_shop(player,board,npc):
         else:
             break
     ui.display_board(board)
+
+def filter_items(inventory):
+    for item in inventory:
+        item_name = item["name"].split(" ")
     
+def wear_equipment(player):
+    util.clear_screen()
+    
+    pass
