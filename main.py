@@ -107,6 +107,7 @@ def main():
                 ui.display_inventory(player["inventory"])
                 util.press_any_button(4)
             elif key =="p":
+                npc = engine.create_npc("Hilary Pilton",15,6)
                 engine.sell_from_inventory(player,board[board_level])
 
             #Changing board level
