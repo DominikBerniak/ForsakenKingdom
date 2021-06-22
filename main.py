@@ -36,8 +36,8 @@ def main():
         board_level = 0
 
 
-        player["inventory"].extend([{'type': 'armor', 'name': 'Mail Shoes', 'value': 1}, {'type': 'gold', 'name': 'Gold', 'value': 8},
-        {'type': 'consumable', 'name': 'Godlike Cheese', 'value': 29},{'type': 'armor', 'name': 'Chain Chestplate', 'value': 2}])
+        player["inventory"].extend([{'type': 'Armor', 'name': 'Mail Shoes', 'value': 1}, {'type': 'gold', 'name': 'Gold', 'value': 8},
+        {'type': 'Health', 'name': 'Godlike Cheese', 'value': 29},{'type': 'Health', 'name': 'Pizza', 'value': 20}])
 
         util.clear_screen()
         while True:
