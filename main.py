@@ -96,9 +96,7 @@ def main():
                 ui.display_inventory(player["inventory"])
                 util.press_any_button(4)
             elif key =="p":
-                peter = engine.create_peter()
-                engine.do_quest(peter,board,player)
-            
+                engine.sell_from_inventory(player,board[board_level])
             
     elif option == "quit":
         quit()

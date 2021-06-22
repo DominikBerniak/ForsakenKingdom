@@ -49,7 +49,6 @@ def put_player_on_board(board, player):
     board[player_row][player_col] = player_icon
 
 def get_confirmation(message):
-    ui.clear_screen()
     confirmation = util.get_input(message,2).lower()
     return confirmation in ["yes", "y"]
 
@@ -265,5 +264,38 @@ def add_to_inventory(player, added_items):
     if not is_in_inventory:
         inventory.append(added_items)
 
-def remove_from_inventory(inventory, removed_items):
+def sell_from_inventory(player,board):
+    util.clear_screen()
+    unsold_items = ["gold","torch","key"]
+    while True:
+        ui.display_inventory(player["inventory"])
+        name_item_to_sell = util.get_input("What you want sell").lower()
+        index = 0
+        if name_item_to_sell in unsold_items:
+            continue
+        for item in player["inventory"]:
+            if name_item_to_sell == item["name"].lower():
+                break
+            index += 1
+        try:
+            del player["inventory"][index]
+            gold = {
+                "type" : "Gold",
+                "name" : "Gold",
+                "value": 10
+                }
+            add_to_inventory(player,gold)
+            util.clear_screen()
+            ui.display_inventory(player["inventory"])
+        except IndexError:
+            ui.display_error_message(f"You don't have this item")
+        
+        if get_confirmation("Wanna sell somthing else?"):
+            util.clear_screen()
+        else:
+            break
+    ui.display_board(board)
+
+def buy_from_shop(player,board,npc):
     pass
+    
