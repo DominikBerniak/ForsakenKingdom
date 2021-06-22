@@ -121,7 +121,15 @@ def authors():
 
 def instruction():
     ui.clear_screen()
-    information = ["Welcome to Roguelike Game ! La Speluna, a company from San Escobar presents.. "]
+    information = = """Preparation for the game:",
+                "First you need to create a character. Choose the races responsibly! 
+                "Each race has different stats. The character is moved by W/S/A/D. Also \"W\" is
+                "to attacking. 
+                "Objective:
+                "The most important objective is defeating the final boss,
+                "but before you get to this stage, you have to defeat a lot of enemies.
+                "During your adventure you will meet \"npc\" with whom you can trade,
+                "and they can give you a quests."""
     ui.display_message(information,2)
     util.press_any_button(2)
     util.clear_screen()
