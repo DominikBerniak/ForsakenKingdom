@@ -7,6 +7,8 @@ from time import sleep
 PLAYER_ICON = '@'
 CLOSED_DOOR_ICON = 'X'
 OPEN_EXIT_DOOR_ICON = 'O'
+NPC_SHOP_ICON = '$'
+
 PLAYER_START_ROW = 5
 PLAYER_START_COL = 100
 
@@ -102,6 +104,8 @@ def main():
             elif key == "i":
                 ui.display_inventory(player["inventory"])
                 util.press_any_button(4)
+            elif key =="p":
+                engine.sell_from_inventory(player,board[board_level])
 
             #Changing board level
             player_location_row, player_location_col = player["player_location"]
@@ -117,7 +121,6 @@ def main():
                     else:
                         player["player_location"] = engine.player_location_after_door(board[board_level],player_location_row,player_location_col)
                         board_level += 1
-
             
     elif option == "quit":
         quit()

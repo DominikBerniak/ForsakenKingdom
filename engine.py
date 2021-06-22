@@ -113,17 +113,18 @@ def create_item():
     armor_description = ["Plate","Leather","Mail","Cloth"]
     consumable = ["Ham","Cheese","Elixir","Bread","Water"]
     consumable_description = ["Stinky","Tasty","Godlike"]
-    type = ["weapons","weapons","weapons","armor","armor","consumable","gold"]
+    type = ["Weapons","Weapons","Weapons","Armor","Armor","Health","Gold"]
 
     randomized_type = random.choice(type)
     item_stats["type"] = randomized_type
-    if randomized_type == "weapons":
+    if randomized_type == "Weapons":
         item_stats["name"] = random_item_name(weapons,weapons_description)
+        item_stats["type"] = "Attack"
         item_stats["value"] = random.randint(MIN_ATTACK_VALUE,MAX_ATTACK_VALUE)
-    elif randomized_type == "armor":
+    elif randomized_type == "Armor":
         item_stats["name"] = random_item_name(armor,armor_description)
         item_stats["value"] = random.randint(MIN_ARMOR_VALUE,MAX_ARMOR_VALUE)
-    elif randomized_type == "consumable":
+    elif randomized_type == "Health":
         item_stats["name"] = random_item_name(consumable,consumable_description)
         item_stats["value"] = random.randint(MIN_CONSUMABLE_VALUE,MAX_CONSUMABLE_VALUE)
     else:
@@ -158,7 +159,15 @@ def authors():
 
 def instruction():
     ui.clear_screen()
-    information = ["Welcome to Roguelike Game ! La Speluna, a company from San Escobar presents.. "]
+    information =  """Preparation for the game:",
+                "First you need to create a character. Choose the races responsibly! 
+                "Each race has different stats. The character is moved by W/S/A/D. Also \"W\" is
+                "to attacking. 
+                "Objective:
+                "The most important objective is defeating the final boss,
+                "but before you get to this stage, you have to defeat a lot of enemies.
+                "During your adventure you will meet \"npc\" with whom you can trade,
+                "and they can give you a quests."""
     ui.display_message(information,2)
     util.press_any_button(2)
     util.clear_screen()
@@ -228,16 +237,16 @@ def create_npc(name,cost_item,amount_items_in_shop):
 
 def create_torch():
     torch = {
-        "type" : "key",
-        "name" : "torch",
+        "type" : "Key",
+        "name" : "Torch",
         "value": 1
     }
     return torch
 
 def create_key():
     torch = {
-        "type" : "key",
-        "name" : "key",
+        "type" : "Key",
+        "name" : "Key",
         "value": 1
     }
     return torch
@@ -267,7 +276,7 @@ def create_kate():
 def create_adalbert():
     adalbert = {
         "icon":"?",
-        "name": "Adalbert Grip",
+        "name": "Adalbert Gribbs",
         "quest_description": "You must correct answer to my question",
         "quest": "What is a StackOverflow? ",
         "answer":"error",
@@ -275,8 +284,7 @@ def create_adalbert():
     }
     return adalbert
 
-def do_quest(npc,board):
-    #inventory
+def do_quest(npc,board,player):
     util.clear_screen()
     ui.display_message(npc["name"] + ": "+npc["quest_description"])
     ui.display_message("You: ")
@@ -286,13 +294,67 @@ def do_quest(npc,board):
     else:
         ui.display_message(npc["name"]+": "+"uuh, sry you must still learn this")
     
-    if npc["name"] == "peter":
-        key = create_torch()
-    else:
-        key = create_key()
-    #dodaj do inventory
+    util.press_any_button()
+    reward = npc["reward"]
+
+    add_to_inventory(player,reward)
     util.clear_screen()
     ui.display_board(board)
 
+def add_to_inventory(player, added_items):
+    inventory = player["inventory"]
+    is_in_inventory = False
+    for items in inventory:
+        if items["name"] == added_items["name"]:
+            items["value"] += added_items["value"]
+            is_in_inventory = True
+    if not is_in_inventory:
+        inventory.append(added_items)
 
+def create_enemy(player_level):
+    #format MARKER, ATK, MIN HP, MAX HP, ARMOR, EXP
+    current_enemy = []
+    enemies = {"Skeleton":["╥",10,5,50,75, 10], "Ghoul":["╓",20,15,50,5,15], "Boar":["╖", 10, 50, 200,40,25], "Spider":["╫", 15,10,50,20,15],"Ghost":["░",3,1,5,100,5], "Ogre":["V",25,20,75,100,75]}
+    random_enemy = random.choice(list(enemies.items()))
+    marker,atack, min_hp, max_hp, armor, exp = random_enemy[1]
+    if player_level < 5: 
+        max_hp = max_hp//2
+        armor = armor//2 
+    enemy = {"Name": random_enemy[0]},{"Enemy icon":marker},{"Atack":atack},{"Minimum HP": min_hp},{"Maximum HP":max_hp},{"Armor": armor},{"Experience":exp}
+    return enemy
 
+def sell_from_inventory(player,board):
+    util.clear_screen()
+    unsold_items = ["gold","torch","key"]
+    while True:
+        ui.display_inventory(player["inventory"])
+        name_item_to_sell = util.get_input("What you want sell").lower()
+        index = 0
+        if name_item_to_sell in unsold_items:
+            continue
+        for item in player["inventory"]:
+            if name_item_to_sell == item["name"].lower():
+                break
+            index += 1
+        try:
+            del player["inventory"][index]
+            gold = {
+                "type" : "Gold",
+                "name" : "Gold",
+                "value": 10
+                }
+            add_to_inventory(player,gold)
+            util.clear_screen()
+            ui.display_inventory(player["inventory"])
+        except IndexError:
+            ui.display_error_message(f"You don't have this item")
+        
+        if get_confirmation("Wanna sell somthing else?"):
+            util.clear_screen()
+        else:
+            break
+    ui.display_board(board)
+
+def buy_from_shop(player,board,npc):
+    pass
+    
