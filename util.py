@@ -31,9 +31,18 @@ def clear_screen():
     else:
         os.system('clear')
 
-def get_input(label,new_lines=2,filler=4):
+def get_input(label,new_lines=2,filler=4,center=False):
     new_lines = "\n" * new_lines
-    user_input = input(f"{new_lines}{filler*' '}{label}: ")
+    if not center:
+        user_input = input(f"{new_lines}{filler*' '}{label}: ")
+    else:
+        print(new_lines)
+        label_length = len(label)
+        label = f"{label}:".center(119)
+        indent = (119 - label_length)//2 + filler
+        print(label)
+        print()
+        user_input = input("".rjust(indent))
     return user_input
 
 def press_any_button(new_lines=0,indent=4,center=False):

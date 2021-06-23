@@ -94,24 +94,24 @@ def display_stats(player_stats,board,new_lines=0, divider = ", the ", cut = 7):
 
 
 
-def display_menu(title, list_options):
-    display_title(f"   {title}\n")
-    for i in range(1,len(list_options)):
-        print(f"    ({i}) {list_options[i]}")
-    print(f"\n    (0) {list_options[0]}\n")
+# def display_menu(title, list_options):
+#     display_title(f"   {title}\n")
+#     for i in range(1,len(list_options)):
+#         print(f"    ({i}) {list_options[i]}")
+#     print(f"\n    (0) {list_options[0]}\n")
 
 
             #testing centered menu
 
-# def display_menu(title, list_options):
-#     longest_option_lenght = len(max(list_options, key=len))
-#     display_title(f"{title}\n\n".center(119),4,0)
-#     list_of_indieces = list(range(1,len(list_options)))
-#     list_of_indieces.append(0)
-#     for i in list_of_indieces:
-#         option_lenght = len(list_options[i])
-#         filler = (longest_option_lenght - option_lenght) * " "
-#         print(f"({i}) {list_options[i]}{filler}\n".center(119))
+def display_menu(title, list_options):
+    longest_option_lenght = len(max(list_options, key=len))
+    display_title(f"{title}\n\n".center(119),4,0)
+    list_of_indieces = list(range(1,len(list_options)))
+    list_of_indieces.append(0)
+    for i in list_of_indieces:
+        option_lenght = len(list_options[i])
+        filler = (longest_option_lenght - option_lenght) * " "
+        print(f"({i}) {list_options[i]}{filler}\n".center(119))
 
 def display_race_choices(races):
     clear_screen()

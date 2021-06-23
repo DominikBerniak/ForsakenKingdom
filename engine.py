@@ -17,8 +17,8 @@ def create_board(width, height):
 def create_player(player_start_row, player_start_col, player_icon):
     while True:
         ui.clear_screen()
-        ui.display_title("Create your hero")
-        player_stats = {"name":util.get_input("Your hero's name",1).title()}
+        ui.display_title("Create your hero!".center(119),2,0)
+        player_stats = {"name":util.get_input("Your hero's name",2,center=True).title()}
         if player_stats["name"] == "Admin":
             player_stats.update({"race":"God" ,"health":1000000,"lvl":1000000,"exp":0,"attack":1000000,
                                 "armor":1000000,"player_location": [player_start_row,player_start_col],"player_icon":player_icon, "inventory":[],"equipment": []})
@@ -295,7 +295,7 @@ def menu():
     while True:
         create_menu()
         try:
-            option = util.get_input("Select option",2)
+            option = util.get_input("Select option".rjust(130//2),1,0)
             # load_module(int(option))
             option = load_module(int(option))
             if option == "start_game" or option == "quit":
