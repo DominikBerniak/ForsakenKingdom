@@ -25,6 +25,13 @@ def display_board(board):
         row = row.replace("O", " ")
         print(row)
 
+def display_equipment(player):
+    print("\n\n    Your Equipment")
+    equipment = player["equipment"]
+    equipment_headers = ["Head","Chest","Legs","Shoes","Weapon"]
+    for i in range(len(equipment_headers)):
+        print(f"\n\n    {equipment_headers[i]} : {equipment[i]['name']}   {equipment[i]['type']}= {equipment[i]['value']}")
+
 def display_stats(player_stats,board,new_lines=0, divider = ", the ", cut = 7):
     """
     player_stats.keys() = {"name", "race", "health", "lvl", "exp", 
