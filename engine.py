@@ -20,7 +20,7 @@ def create_player(player_start_row, player_start_col, player_icon):
         ui.display_title("Create your hero")
         player_stats = {"name":util.get_input("Your hero's name",1).title()}
         if player_stats["name"] == "Admin":
-            player_stats.update({"race":"God" ,"health":1000000,"lvl":1000000,"exp":90,"attack":1000000,
+            player_stats.update({"race":"God" ,"health":1000000,"lvl":1000000,"exp":0,"attack":1000000,
                                 "armor":1000000,"player_location": [player_start_row,player_start_col],"player_icon":player_icon, "inventory":[]})
             return player_stats
         while True:        
@@ -564,9 +564,6 @@ def wear_equipment(board,player):
             break
     ui.display_board(board)
     
-def fight_enemy(player):
-    util.clear_screen()
-
 def use_item(player):
     inventory = list(player["inventory"])
     inventory_to_display = [inventory[i] for i in range(len(inventory)) if inventory[i]["type"] == "Health"]
@@ -600,11 +597,9 @@ def use_item(player):
 
 def fight_enemy(player,board):
     enemy = create_enemy(player)
-    enemy["exp"] = 10
     enemy_turn = "Enemy"
     player_turn = "Player"
-    # turn = random.choice([enemy_turn,player_turn])
-    turn = player_turn
+    turn = random.choice([enemy_turn,player_turn])
 
     util.clear_screen()
     ui.display_title(f'You have encountered the {enemy["adjective"]} {enemy["name"]}.')
