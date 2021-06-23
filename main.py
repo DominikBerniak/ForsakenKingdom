@@ -43,6 +43,7 @@ def main():
         board = [engine.create_board(BOARD_WIDTH, BOARD_HEIGHT),engine.create_board(BOARD_WIDTH, BOARD_HEIGHT),engine.create_board(BOARD_WIDTH, BOARD_HEIGHT)]
         engine.put_door_on_board(board,CLOSED_DOOR_ICON)
         engine.put_npc_shop_on_board(board,NPC_SHOP_ICON)
+        engine.put_npc_quest_on_board(board,NPC_QUEST_ICON)
         engine.put_enemy_on_board(board,ENEMY_ICON)
         engine.put_item_on_board(board,ITEM_ICON)
         board_level = 0
@@ -69,7 +70,7 @@ def main():
                     player["player_location"][0] -= 1
                     winsound.Beep(150,100)
                 else:
-                    player_encounter = engine.encounter(board[board_level], player,player_location_row-1,player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON)
+                    player_encounter = engine.encounter(board[board_level], player,player_location_row-1,player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level)
                     player["player_location"][0] -= player_encounter[0]
                     if len(player_encounter) > 1 and player_encounter[1] == "defeat":
                         return player_dead(player)
@@ -79,7 +80,7 @@ def main():
                     player["player_location"][0] += 1
                     winsound.Beep(150,100)
                 else:
-                    player_encounter = engine.encounter(board[board_level], player,player_location_row+1, player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON)
+                    player_encounter = engine.encounter(board[board_level], player,player_location_row+1, player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level)
                     player["player_location"][0] += player_encounter[0]
                     if len(player_encounter) > 1 and player_encounter[1] == "defeat":
                         return player_dead(player)
@@ -89,7 +90,7 @@ def main():
                     player["player_location"][1] -= 1 
                     winsound.Beep(150,100)
                 else:
-                    player_encounter = engine.encounter(board[board_level], player,player_location_row,player_location_col-1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON) 
+                    player_encounter = engine.encounter(board[board_level], player,player_location_row,player_location_col-1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level) 
                     player["player_location"][1] -= player_encounter[0]
                     if len(player_encounter) > 1 and player_encounter[1] == "defeat":
                         return player_dead(player)
@@ -99,7 +100,7 @@ def main():
                     player["player_location"][1] += 1 
                     winsound.Beep(150,100)
                 else:
-                    player_encounter = engine.encounter(board[board_level], player,player_location_row,player_location_col+1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON) 
+                    player_encounter = engine.encounter(board[board_level], player,player_location_row,player_location_col+1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level) 
                     player["player_location"][1] += player_encounter[0]
                     if len(player_encounter) > 1 and player_encounter[1] == "defeat":
                         return player_dead(player)

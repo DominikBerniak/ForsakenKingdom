@@ -114,6 +114,15 @@ def put_door_on_board(board,door_icon):
         if i < len(board)-1:
             board[i+1][exit_door_row][exit_door_col] = "O" #open door
 
+def put_npc_quest_on_board(board,npc_quest_icon):
+    for i in range(len(board)):
+        npc_row = random.randint(1, len(board[i])-2)
+        npc_col = random.randint(1, len(board[i][0])-2)
+        while not is_unoccupied(board[i],npc_row,npc_col):
+            npc_row = random.randint(1, len(board[i])-2)
+            npc_col = random.randint(1, len(board[i][0])-2)
+        board[i][npc_row][npc_col] = npc_quest_icon
+
 def put_npc_shop_on_board(board,npc_shop_icon):
     for i in range(len(board)):
         npc_row = random.randint(1, len(board[i])-2)
@@ -316,7 +325,7 @@ def create_peter():
         "icon": "?",
         "name":"Peter Iscoming",
         "quest_description":"You must correct answer to my question",
-        "quest":"What is the name of command to add one or more files to the staging area?",
+        "quest":"What is the name of command to add one or more files to the staging area? ",
         "answer": "git add",
         "reward": create_torch()
     }
@@ -327,7 +336,7 @@ def create_kate():
         "icon": "?",
         "name": "Kate Antlish",
         "quest_description": "You must correct answer to my question",
-        "quest": "How reversed string where variable name word?",
+        "quest": "How reversed string where variable name word? ",
         "answer":"word[::-1]",
         "reward":create_key()
     }
@@ -344,6 +353,12 @@ def create_adalbert():
     }
     return adalbert
 
+def have_key_in_inventory(inventory):
+    for item in inventory:
+        if item["type"] == "Key":
+            return True
+    return False
+
 def do_quest(board,player,board_lvl):
     if board_lvl == 0:
         npc = create_kate()
@@ -351,20 +366,23 @@ def do_quest(board,player,board_lvl):
         npc = create_adalbert()
     else:
         npc = create_peter()
+    if not have_key_in_inventory(player["inventory"]):
+        util.clear_screen()
+        ui.display_message(npc["name"] + ": "+npc["quest_description"])
+        answer = util.get_input(npc["name"]+": "+npc["quest"])
+        reward = npc["reward"]
 
-    util.clear_screen()
-    ui.display_message(npc["name"] + ": "+npc["quest_description"])
-    ui.display_message("You: ")
-    answer = input(npc["quest"])
-    if answer == npc["answer"]:
-        ui.display_message(npc["name"]+": "+"Correct, you got a key!!")
+        if answer == npc["answer"]:
+            ui.display_message(npc["name"]+": "+"Correct, you got a key!!")
+            add_to_inventory(player,reward)
+        else:
+            ui.display_message(npc["name"]+": "+"uuh, sry you must still learn this")
+        util.press_any_button()
     else:
-        ui.display_message(npc["name"]+": "+"uuh, sry you must still learn this")
-    
-    util.press_any_button()
-    reward = npc["reward"]
+        util.clear_screen()
+        ui.display_message(npc["name"]+": "+"You have a key!! Go open the door :-D")
+        util.press_any_button()
 
-    add_to_inventory(player,reward)
     util.clear_screen()
     ui.display_board(board)
 
@@ -583,9 +601,9 @@ def fight_enemy(player,board):
     else:
         return "defeat"
 
-def encounter(board, player,player_row, player_col,quest_icon,shop_icon,enemy_icon,item_icon):
+def encounter(board, player,player_row, player_col,quest_icon,shop_icon,enemy_icon,item_icon,board_lvl):
     if board[player_row][player_col] == quest_icon:
-        # quest()
+        do_quest(board,player,board_lvl)
         return [0]
     elif board[player_row][player_col] == shop_icon:
         # open_shop()
