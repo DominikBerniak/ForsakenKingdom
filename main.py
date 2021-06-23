@@ -36,8 +36,8 @@ def main():
         board_level = 0
 
 
-        player["inventory"].extend([{'type': 'armor', 'name': 'Mail Shoes', 'value': 1}, {'type': 'gold', 'name': 'Gold', 'value': 8},
-        {'type': 'consumable', 'name': 'Godlike Cheese', 'value': 29},{'type': 'armor', 'name': 'Chain Chestplate', 'value': 2}])
+        player["inventory"].extend([{'type': 'Armor', 'name': 'Mail Shoes', 'value': 1}, {'type': 'Armor', 'name': 'Cloth Helmet', 'value': 8},
+        {'type': 'Armor', 'name': 'Plate Helmet', 'value': 29},{'type': 'Armor', 'name': 'Mail Chest', 'value': 2},{'type': 'Weapons', 'name': 'Wooden Sword', 'value': 2}])
 
         util.clear_screen()
         while True:
@@ -56,33 +56,32 @@ def main():
                 if engine.is_unoccupied(board[board_level],player_location_row-1,player_location_col):
                     player["player_location"][0] -= 1
                 else:
-                    player["player_location"][0] -= engine.encounter(board[board_level], player,player_location_row-1,player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON)
+                    player["player_location"][0] -= engine.encounter(board[board_level], player,player_location_row-1,player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,board_level)
 
             elif key == "s" and engine.is_not_wall(board[board_level], player_location_row+1, player_location_col,CLOSED_DOOR_ICON):
                 if engine.is_unoccupied(board[board_level],player_location_row+1,player_location_col):
                     player["player_location"][0] += 1
                 else:
-                    player["player_location"][0] += engine.encounter(board[board_level], player,player_location_row+1, player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON)
+                    player["player_location"][0] += engine.encounter(board[board_level], player,player_location_row+1, player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,board_level)
 
             elif key == "a" and engine.is_not_wall(board[board_level], player_location_row, player_location_col-1,CLOSED_DOOR_ICON):
                 if engine.is_unoccupied(board[board_level],player_location_row,player_location_col-1):
                     player["player_location"][1] -= 1 
                 else:
-                    player["player_location"][1] -= engine.encounter(board[board_level], player,player_location_row,player_location_col-1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON) 
+                    player["player_location"][1] -= engine.encounter(board[board_level], player,player_location_row,player_location_col-1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,board_level) 
 
             elif key == "d" and engine.is_not_wall(board[board_level], player_location_row, player_location_col+1,CLOSED_DOOR_ICON):
                 if engine.is_unoccupied(board[board_level],player_location_row,player_location_col+1):
                     player["player_location"][1] += 1 
                 else:
-                    player["player_location"][1] += engine.encounter(board[board_level], player,player_location_row,player_location_col+1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON) 
+                    player["player_location"][1] += engine.encounter(board[board_level], player,player_location_row,player_location_col+1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,board_level) 
 
             elif key == "i":
                 ui.display_inventory(player["inventory"])
                 util.press_any_button(4)
-            elif key =="p":
-                npc = engine.create_npc("Hilary Pilton",15,6)
-                engine.sell_from_inventory(player,board[board_level])
-            
+
+            elif key =="b":
+                engine.wear_equipment(board[board_level],player)
 
             #Changing board level
             player_location_row, player_location_col = player["player_location"]

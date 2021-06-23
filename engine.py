@@ -15,13 +15,16 @@ def create_board(width, height):
     return board
 
 def create_player(player_start_row, player_start_col, player_icon):
+    item_nothing_armor = {"name":"Nothing","type":"Armor","value":0}
+    item_nothing_weapon = {"name":"Nothing","type":"Attack","value":0}
+    start_equipment = [item_nothing_armor,item_nothing_armor,item_nothing_armor,item_nothing_armor,item_nothing_weapon]
     while True:
         ui.clear_screen()
         ui.display_title("Create your hero")
         player_stats = {"name":util.get_input("Your hero's name",1).title()}
         if player_stats["name"] == "Admin":
             player_stats.update({"race":"God" ,"health":1000000,"lvl":1000000,"exp":1000000,"attack":1000000,
-                                "armor":1000000,"player_location": [player_start_row,player_start_col],"player_icon":player_icon, "inventory":[]})
+                                "armor":1000000,"player_location": [player_start_row,player_start_col],"player_icon":player_icon, "inventory":[],"equipment":start_equipment})
             return player_stats
         while True:        
             orc = {"race":"Orc" ,"health":125,"lvl":1,"exp":0,"attack":7,"armor":20}
@@ -48,7 +51,7 @@ def create_player(player_start_row, player_start_col, player_icon):
                 ui.display_error_message("    Wrong race name!")
                 sleep(2)      
         player_stats.update({"player_location": [player_start_row,player_start_col],
-                                "player_icon":player_icon, "inventory": []})
+                                "player_icon":player_icon, "inventory": [],"equipment":start_equipment})
         ui.clear_screen()
         if util.get_confirmation(f"""You've created {player_stats["name"]}, the {player_stats["race"]}.
     
@@ -212,6 +215,7 @@ def instruction():
                 "but before you get to this stage, you have to defeat a lot of enemies.
                 "During your adventure you will meet \"npc\" with whom you can trade,
                 "and they can give you a quests."""
+
     ui.display_message(information,2)
     util.press_any_button(2)
     util.clear_screen()
@@ -328,7 +332,14 @@ def create_adalbert():
     }
     return adalbert
 
-def do_quest(npc,board,player):
+def do_quest(board,player,board_lvl):
+    if board_lvl == 0:
+        npc = create_kate()
+    elif board_lvl == 1:
+        npc = create_adalbert()
+    else:
+        npc = create_peter()
+
     util.clear_screen()
     ui.display_message(npc["name"] + ": "+npc["quest_description"])
     ui.display_message("You: ")
@@ -362,17 +373,15 @@ def update_gold_in_inventory(inventory,amount_of_gold):
                 raise ValueError
             else:
                 inventory[index]["value"] += amount_of_gold
-<<<<<<< HEAD
-
-def create_enemy(player_level):
-=======
                 
 def create_enemy(player):
->>>>>>> 74822abe849a1bdff146d97ab13190fae5cfb038
     #format MARKER, ATK, MIN HP, MAX HP, ARMOR, EXP
     player_level = player["lvl"]
     enemies = {"Skeleton":["╥",10,5,50,75, 10], "Ghoul":["╓",20,15,50,5,15], "Boar":["╖", 10, 50, 200,40,25],
                  "Spider":["╫", 15,10,50,20,15],"Ghost":["░",3,1,5,100,5], "Ogre":["V",25,20,75,100,75]}
+
+    for enemy in enemies:
+        print(enemies[enemy][0],end=" ")
     random_enemy = random.choice(list(enemies.items()))
     marker,atack, min_hp, max_hp, armor, exp = random_enemy[1]
     if player_level < 5: 
@@ -419,11 +428,6 @@ def buy_from_shop(player,npc):
         try:
             add_to_inventory(player,shop[index])
             del shop[index]
-            gold = {
-                "type" : "Gold",
-                "name" : "Gold",
-                "value": -(npc["cost_item"])
-                }
             update_gold_in_inventory(player["inventory"],-(npc["cost_item"]))
             util.clear_screen()
             ui.display_inventory(player["inventory"])
@@ -436,18 +440,67 @@ def buy_from_shop(player,npc):
             util.clear_screen()
         else:
             break
-<<<<<<< HEAD
-    ui.display_board(board)
 
-def filter_items(inventory):
-    for item in inventory:
-        item_name = item["name"].split(" ")
-    
-def wear_equipment(player):
-    util.clear_screen()
-    
-    pass
-=======
+def filter_items(inventory,type,part_of_armor=""):
+    filtred_inventory = []
+    if type == "Armor":
+        for item in inventory:
+            item_name = item["name"].split(" ")
+            if part_of_armor in item_name:
+                filtred_inventory.append(item)
+    elif type == "Weapons":
+        for item in inventory:
+            if item["type"] == type:
+                filtred_inventory.append(item)
+    return filtred_inventory
+
+def choose_item_to_wear(filtred_inventory,player,number_of_part_equipment):
+    while True:
+        util.clear_screen()
+        ui.display_inventory(filtred_inventory)
+        item_from_inventory = util.get_input("Choose item to wear").lower()
+        for item in filtred_inventory:
+            if item["name"].lower() == item_from_inventory:
+                return item
+        if item_from_inventory == "return":
+            return player["equipment"][number_of_part_equipment]
+        ui.display_error_message(f"You not have {item_from_inventory.title()} in item")
+        util.press_any_button()
+
+def wear_equipment(board,player):
+    while True:
+        util.clear_screen()
+        ui.display_equipment(player)
+        equipment = player["equipment"]
+        part_of_equipment = util.get_input("Choose your part of equipment").title()
+        if part_of_equipment == "Head":
+            filtred_item = filter_items(player["inventory"],"Armor","Helmet")
+            player["armor"] -= equipment[0]["value"]
+            equipment[0] = choose_item_to_wear(filtred_item,player,0)
+            player["armor"] += equipment[0]["value"]
+        elif part_of_equipment == "Chest":
+            filtred_item = filter_items(player["inventory"],"Armor","Chest")
+            player["armor"] -= equipment[1]["value"]
+            equipment[1] = choose_item_to_wear(filtred_item,player,1)
+            player["armor"] += equipment[1]["value"]
+        elif part_of_equipment == "Legs":
+            filtred_item = filter_items(player["inventory"],"Armor","Trousers")
+            player["armor"] -= equipment[2]["value"]
+            equipment[2] = choose_item_to_wear(filtred_item,player,2)
+            player["armor"] += equipment[2]["value"]
+        elif part_of_equipment == "Shoes":
+            filtred_item = filter_items(player["inventory"],"Armor","Shoes")
+            player["armor"] -= equipment[3]["value"]
+            equipment[3] = choose_item_to_wear(filtred_item,player,3)
+            player["armor"] += equipment[3]["value"]
+        elif part_of_equipment == "Weapon":
+            filtred_item = filter_items(player["inventory"],"Weapons")
+            player["attack"] -= equipment[4]["value"]
+            equipment[4] = choose_item_to_wear(filtred_item,player,4)
+            player["attack"] += equipment[4]["value"]
+        else:
+            break
+    ui.display_board(board)
     
 def fight_enemy(player):
     util.clear_screen()
@@ -459,10 +512,9 @@ def fight_enemy(player):
     ui.display_title(f'You have encountered the {enemy_adjective} {enemy["name"]}.')
     input()
 
-
-def encounter(board, player,player_row, player_col,quest_icon,shop_icon,enemy_icon):
+def encounter(board, player,player_row, player_col,quest_icon,shop_icon,enemy_icon,board_lvl):
     if board[player_row][player_col] == quest_icon:
-        # quest()
+        do_quest(board,player,board_lvl)
         return 0
     elif board[player_row][player_col] == shop_icon:
         # open_shop()
@@ -470,4 +522,3 @@ def encounter(board, player,player_row, player_col,quest_icon,shop_icon,enemy_ic
     elif board[player_row][player_col] == enemy_icon:
         fight_enemy(player)
         return 1
->>>>>>> 74822abe849a1bdff146d97ab13190fae5cfb038
