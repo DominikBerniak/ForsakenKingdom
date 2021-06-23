@@ -123,6 +123,18 @@ def put_npc_shop_on_board(board,npc_shop_icon):
             npc_col = random.randint(1, len(board[i][0])-2)
         board[i][npc_row][npc_col] = npc_shop_icon
 
+def put_item_on_board(board,item_icon):
+    for i in range(len(board)):
+        number_of_items = random.randint(10,15)
+        while number_of_items > 0:
+            npc_row = random.randint(1, len(board[i])-2)
+            npc_col = random.randint(1, len(board[i][0])-2)
+            while not is_unoccupied(board[i],npc_row,npc_col):
+                npc_row = random.randint(1, len(board[i])-2)
+                npc_col = random.randint(1, len(board[i][0])-2)
+            board[i][npc_row][npc_col] = item_icon
+            number_of_items -= 1
+
 def put_enemy_on_board(board,enemy_icon):
     for i in range(len(board)):
         number_of_enemies = random.randint(10,15)
@@ -387,7 +399,8 @@ def create_enemy(player):
     if player_level < 5: 
         max_hp = max_hp//2
         armor = armor//2
-    enemy = {"name": random_enemy[0],"enemy_icon":marker,"attack":atack,"minimum_hp": min_hp,"maximum_hp":max_hp,"armor": armor,"exp":exp}
+    health = random.randint(min_hp, max_hp)
+    enemy = {"name": random_enemy[0],"enemy_icon":marker,"attack":atack,"health": health,"armor": armor,"exp":exp}
     return enemy
 
 def sell_from_inventory(player):
@@ -504,21 +517,83 @@ def wear_equipment(board,player):
     
 def fight_enemy(player):
     util.clear_screen()
+def use_item(player):
+    inventory = list(player["inventory"])
+    inventory_to_display = [inventory[i] for i in range(len(inventory)) if inventory[i]["type"] == "Health"]
+    if len(inventory_to_display)>0:
+        while True:
+            util.clear_screen()
+            ui.display_inventory(inventory_to_display,"Consumables:\n")
+            was_item_used = False
+            player_input = util.get_input("What do you want to use?\n\n    (name of item / return)",4).title()
+            if player_input == "Return":
+                return False
+            for i in range(len(inventory)):
+                if inventory[i]["name"] == player_input:
+                    player["health"] += inventory[i]["value"]
+                    player["inventory"].pop(i)
+                    was_item_used = True
+                    break
+            if was_item_used:
+                return was_item_used
+            else:
+                ui.display_error_message("No such item in your inventory", 4)
+                util.press_any_button(1)
+    else:
+        util.clear_screen()
+        ui.display_error_message("There are no consumables in your inventory",4)
+        util.press_any_button(1)
+        return False
+
+
+def fight_enemy(player,board):
     enemy = create_enemy(player)
     enemy_adjectives = ["Mighty", "Fearless", "Powerful", "Deadly", "Ferocious", "Horrifying", "Frightening", "Spooky", "Ghostly"]
     enemy_adjective = random.choice(enemy_adjectives)
     if enemy["name"] == "Skeleton":
         enemy_adjective = random.choice([enemy_adjective, "Scary Spooky"])
-    ui.display_title(f'You have encountered the {enemy_adjective} {enemy["name"]}.')
-    input()
+    enemy_turn = "Enemy"
+    player_turn = "Player"
+    turn = random.choice([enemy_turn,player_turn])
 
-def encounter(board, player,player_row, player_col,quest_icon,shop_icon,enemy_icon,board_lvl):
+    while enemy["health"]>0 or player["health"]>0:
+        util.clear_screen()
+        ui.display_stats(player,board)
+        ui.display_title(f'You have encountered the {enemy_adjective} {enemy["name"]}.')
+        if turn == "Enemy":
+            ui.display_message(f"It's {turn}'s turn to attack",1)
+            turn = "Player"
+        else:
+            ui.display_message(f"It's your turn to attack",1)
+            ui.display_message("Attack  | Use Item",2)
+            player_input = input("    ").lower().replace(" ", "")
+            if player_input in ["useitem", "u", "i"]:
+                did_use_item = use_item(player)
+                if did_use_item:
+                    turn = "Enemy"            
+            else:
+                turn = "Enemy"
+                return
+    if enemy["health"] <= 0:
+        player["exp"] += enemy["exp"]
+        if player["exp"] >= 100:
+            player["lvl"] += 1
+            player["exp"] -= 100
+        return "victory"
+    else:
+        return "defeat"
+
+def encounter(board, player,player_row, player_col,quest_icon,shop_icon,enemy_icon,item_icon):
     if board[player_row][player_col] == quest_icon:
-        do_quest(board,player,board_lvl)
-        return 0
+        # quest()
+        return [0]
     elif board[player_row][player_col] == shop_icon:
         # open_shop()
-        return 0
+        return [0]
+    elif board[player_row][player_col] == item_icon:
+        # 
+        return [1]
     elif board[player_row][player_col] == enemy_icon:
-        fight_enemy(player)
-        return 1
+        result = fight_enemy(player,board)
+        if result == "victory":
+            return 1

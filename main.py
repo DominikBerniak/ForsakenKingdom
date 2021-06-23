@@ -3,6 +3,7 @@ import engine
 import ui
 import os
 from time import sleep
+import winsound
 
 PLAYER_ICON = '@'
 CLOSED_DOOR_ICON = 'X'
@@ -10,12 +11,22 @@ OPEN_EXIT_DOOR_ICON = 'O'
 NPC_SHOP_ICON = '$'
 NPC_QUEST_ICON = "?"
 ENEMY_ICON = 'T'
+ITEM_ICON = '&'
 
-PLAYER_START_ROW = 5
-PLAYER_START_COL = 100
+PLAYER_START_ROW = 30
+PLAYER_START_COL = 57
 
 BOARD_WIDTH = 115
 BOARD_HEIGHT = 30
+
+
+def player_dead(player):
+    util.clear_screen()
+    ui.display_title("You are dead")
+    ui.display_message(f"You have achieved {player['lvl']} hero level.",2)
+    util.press_any_button(4)
+    return main()
+
 
 def quit():
     ui.clear_screen()
@@ -33,11 +44,12 @@ def main():
         engine.put_door_on_board(board,CLOSED_DOOR_ICON)
         engine.put_npc_shop_on_board(board,NPC_SHOP_ICON)
         engine.put_enemy_on_board(board,ENEMY_ICON)
+        engine.put_item_on_board(board,ITEM_ICON)
         board_level = 0
 
 
-        player["inventory"].extend([{'type': 'Armor', 'name': 'Mail Shoes', 'value': 1}, {'type': 'Armor', 'name': 'Cloth Helmet', 'value': 8},
-        {'type': 'Armor', 'name': 'Plate Helmet', 'value': 29},{'type': 'Armor', 'name': 'Mail Chest', 'value': 2},{'type': 'Weapons', 'name': 'Wooden Sword', 'value': 2}])
+        player["inventory"].extend([{'type': 'Armor', 'name': 'Mail Shoes', 'value': 1}, {'type': 'gold', 'name': 'Gold', 'value': 8},
+        {'type': 'Health', 'name': 'Godlike Cheese', 'value': 29},{'type': 'Health', 'name': 'Pizza', 'value': 20}])
 
         util.clear_screen()
         while True:
@@ -55,26 +67,42 @@ def main():
             elif key == "w" and engine.is_not_wall(board[board_level], player_location_row-1, player_location_col,CLOSED_DOOR_ICON):
                 if engine.is_unoccupied(board[board_level],player_location_row-1,player_location_col):
                     player["player_location"][0] -= 1
+                    winsound.Beep(150,100)
                 else:
-                    player["player_location"][0] -= engine.encounter(board[board_level], player,player_location_row-1,player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,board_level)
+                    player_encounter = engine.encounter(board[board_level], player,player_location_row-1,player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON)
+                    player["player_location"][0] -= player_encounter[0]
+                    if len(player_encounter) > 1 and player_encounter[1] == "defeat":
+                        return player_dead(player)
 
             elif key == "s" and engine.is_not_wall(board[board_level], player_location_row+1, player_location_col,CLOSED_DOOR_ICON):
                 if engine.is_unoccupied(board[board_level],player_location_row+1,player_location_col):
                     player["player_location"][0] += 1
+                    winsound.Beep(150,100)
                 else:
-                    player["player_location"][0] += engine.encounter(board[board_level], player,player_location_row+1, player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,board_level)
+                    player_encounter = engine.encounter(board[board_level], player,player_location_row+1, player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON)
+                    player["player_location"][0] += player_encounter[0]
+                    if len(player_encounter) > 1 and player_encounter[1] == "defeat":
+                        return player_dead(player)
 
             elif key == "a" and engine.is_not_wall(board[board_level], player_location_row, player_location_col-1,CLOSED_DOOR_ICON):
                 if engine.is_unoccupied(board[board_level],player_location_row,player_location_col-1):
                     player["player_location"][1] -= 1 
+                    winsound.Beep(150,100)
                 else:
-                    player["player_location"][1] -= engine.encounter(board[board_level], player,player_location_row,player_location_col-1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,board_level) 
+                    player_encounter = engine.encounter(board[board_level], player,player_location_row,player_location_col-1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON) 
+                    player["player_location"][1] -= player_encounter[0]
+                    if len(player_encounter) > 1 and player_encounter[1] == "defeat":
+                        return player_dead(player)
 
             elif key == "d" and engine.is_not_wall(board[board_level], player_location_row, player_location_col+1,CLOSED_DOOR_ICON):
                 if engine.is_unoccupied(board[board_level],player_location_row,player_location_col+1):
                     player["player_location"][1] += 1 
+                    winsound.Beep(150,100)
                 else:
-                    player["player_location"][1] += engine.encounter(board[board_level], player,player_location_row,player_location_col+1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,board_level) 
+                    player_encounter = engine.encounter(board[board_level], player,player_location_row,player_location_col+1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON) 
+                    player["player_location"][1] += player_encounter[0]
+                    if len(player_encounter) > 1 and player_encounter[1] == "defeat":
+                        return player_dead(player)
 
             elif key == "i":
                 ui.display_inventory(player["inventory"])

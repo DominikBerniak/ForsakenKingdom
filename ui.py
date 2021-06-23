@@ -4,8 +4,9 @@ def display_message(message, new_lines=0):
     new_lines = "\n"*new_lines
     print(f"{new_lines}    {message}")
 
-def display_error_message(message):
-    print("\n\n    " + message)
+def display_error_message(message,new_lines=2):
+    new_lines = "\n"*new_lines
+    print(f"{new_lines}    {message}")
 
 def display_title(title):
     print(f"\n\n    {title}")
@@ -98,7 +99,7 @@ def display_race_choices(races):
         if i < len(races)-1:
             print("\n    ============================")
             
-def display_inventory(inventory):
+def display_inventory(inventory, lable = "Inventory:\n"):
     # inventory = [{'type': str, 'name': str, 'value': int}, ...]
     inventory = sorted(inventory, key=lambda x: x["type"])
     longest_name = 0
@@ -109,7 +110,7 @@ def display_inventory(inventory):
         elif len(inventory[i]["type"]) > longest_type:
             longest_type = len(inventory[i]["type"])
     clear_screen()
-    display_title("Inventory:\n")
+    display_title(lable)
     for i in range(len(inventory)):
         name_lenght = len(inventory[i]["name"])
         type_lenght = len(inventory[i]["type"])
