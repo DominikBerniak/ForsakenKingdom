@@ -110,7 +110,6 @@ def put_door_on_board(board,door_icon):
         if i < len(board)-1:
             board[i+1][exit_door_row][exit_door_col] = "O" #open door
 
-<<<<<<< HEAD
 def find_the_door(board):
     for row in range(len(board)):
         for col in range(len(board[0])):
@@ -141,8 +140,6 @@ def put_npc_quest_on_board(board,npc_quest_icon):
             npc_col = random.randint(1, len(board[i][0])-2)
         board[i][npc_row][npc_col] = npc_quest_icon
 
-=======
->>>>>>> bed7a994472d5f1b67c3eb13ea0febfcea7dd35a
 def put_npc_shop_on_board(board,npc_shop_icon):
     for i in range(len(board)):
         npc_row = random.randint(1, len(board[i])-2)
@@ -415,7 +412,6 @@ def create_adalbert():
     }
     return adalbert
 
-<<<<<<< HEAD
 def have_key_in_inventory(inventory):
     index =0
     for item in inventory:
@@ -443,15 +439,6 @@ def do_quest(board,player,board_lvl):
         else:
             ui.display_message(npc["name"]+": "+"uuh, sry you must still learn this")
         util.press_any_button()
-=======
-def do_quest(npc,board,player):
-    util.clear_screen()
-    ui.display_message(npc["name"] + ": "+npc["quest_description"])
-    ui.display_message("You: ")
-    answer = input(npc["quest"])
-    if answer == npc["answer"]:
-        ui.display_message(npc["name"]+": "+"Correct, you got a key!!")
->>>>>>> bed7a994472d5f1b67c3eb13ea0febfcea7dd35a
     else:
         ui.display_message(npc["name"]+": "+"uuh, sry you must still learn this")
     
@@ -550,7 +537,6 @@ def buy_from_shop(player,npc):
         else:
             break
 
-<<<<<<< HEAD
 def filter_items(inventory,type,part_of_armor=""):
     filtred_inventory = []
     if type == "Armor":
@@ -615,8 +601,6 @@ def wear_equipment(board,player):
 def fight_enemy(player):
     util.clear_screen()
 
-=======
->>>>>>> bed7a994472d5f1b67c3eb13ea0febfcea7dd35a
 def use_item(player):
     inventory = list(player["inventory"])
     inventory_to_display = [inventory[i] for i in range(len(inventory)) if inventory[i]["type"] == "Health"]
@@ -678,32 +662,20 @@ def fight_enemy(player,board):
             turn = "Player"
 
 
-<<<<<<< HEAD
 def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_icon,item_icon,board_level,door_icon):
     if board[player_row][player_col] == quest_icon:
         do_quest(board,player,board_level)
         return [0]
-=======
-    input()
-
-
-def encounter(board, player,player_row, player_col,quest_icon,shop_icon,enemy_icon):
-    if board[player_row][player_col] == quest_icon:
-        # quest()
-        return 0
->>>>>>> bed7a994472d5f1b67c3eb13ea0febfcea7dd35a
     elif board[player_row][player_col] == shop_icon:
         # open_shop()
         return 0
     elif board[player_row][player_col] == enemy_icon:
-<<<<<<< HEAD
         result = fight_enemy(player,board)
         if result == "victory":
             return 1
     elif board[player_row][player_col] == door_icon:
         open_the_door(board, player)
         return[0]
-=======
         fight_enemy(player,board)
         return 1
 
@@ -718,4 +690,3 @@ def interaction_with_traders(player):
         util.clear_screen()
         ui.display_error_message("    I don't understand. See you later!")
         sleep(2)
->>>>>>> bed7a994472d5f1b67c3eb13ea0febfcea7dd35a
