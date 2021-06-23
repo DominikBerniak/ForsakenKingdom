@@ -57,7 +57,7 @@ def create_player(player_start_row, player_start_col, player_icon):
     return player_stats
 
 def is_unoccupied(board,row,col):
-    return board[row][col] == " " or board[row][col] == "O" or board[row][col] == "T"
+    return board[row][col] == " " or board[row][col] == "O"
 
 def is_not_wall(board, row, col,door_icon):
     return (board[row][col] != "=" and board[row][col] != "|" 
@@ -122,58 +122,15 @@ def put_npc_shop_on_board(board,npc_shop_icon):
 
 def put_item_on_board(board,item_icon):
     for i in range(len(board)):
-        item_row = random.randint(1, len(board[i])-2)
-        item_col = random.randint(1, len(board[i][0])-2)
-        for x in range (0,11):
-            while not is_unoccupied(board[i],item_row,item_col):
-                item_row = random.randint(1, len(board[i])-2)
-                item_col = random.randint(1, len(board[i][0])-2)
-                x-=1
-            board[i][item_row][item_col] = item_icon
-
-
-
-# def put_enemy_on_board(board,item_icon_board):
-#     for i in range(len(board)):
-#         npc_row = random.randint(1, len(board[i])-2)
-#         npc_col = random.randint(1, len(board[i][0])-2)
-#         while not is_unoccupied(board[i],npc_row,npc_col):
-#             npc_row = random.randint(1, len(board[i])-2)
-#             npc_col = random.randint(1, len(board[i][0])-2)
-#         board[i][npc_row][npc_col] = item_icon_board
-
-
-# def put_enemy_on_board(board,item_icon_board):
-#     x=10
-#     while x>=0:
-#         if not is_unoccupied (board[i],item_row,item_col):
-#             item_row = random.randint(1, len(board[i])-2)
-#             item_col = random.randint(1, len(board[i][0])-2)
-
-
-#     for i in range(len(board)):
-#         npc_row = random.randint(1, len(board[i])-2)
-#         npc_col = random.randint(1, len(board[i][0])-2)
-#         while not is_unoccupied(board[i],npc_row,npc_col):
-#             npc_row = random.randint(1, len(board[i])-2)
-#             npc_col = random.randint(1, len(board[i][0])-2)
-#         board[i][npc_row][npc_col] = item_icon_board
-
-
-
-
-
-
-    # for i in range(len(board)):
-    #     number_of_enemies = random.randint(10,15)
-    #     while number_of_enemies > 0:
-    #         item_row = random.randint(1, len(board[i])-2)
-    #         item_col = random.randint(1, len(board[i][0])-2)
-    #         while not is_unoccupied(board[i],item_row,item_col):
-    #             item_row = random.randint(1, len(board[i])-2)
-    #             item_col = random.randint(1, len(board[i][0])-2)
-    #         board[i][item_row][item_col] = enemy_icon
-    #         number_of_enemies -= 1
+        number_of_items = random.randint(10,15)
+        while number_of_items > 0:
+            npc_row = random.randint(1, len(board[i])-2)
+            npc_col = random.randint(1, len(board[i][0])-2)
+            while not is_unoccupied(board[i],npc_row,npc_col):
+                npc_row = random.randint(1, len(board[i])-2)
+                npc_col = random.randint(1, len(board[i][0])-2)
+            board[i][npc_row][npc_col] = item_icon
+            number_of_items -= 1
 
 def put_enemy_on_board(board,enemy_icon):
     for i in range(len(board)):
@@ -533,9 +490,9 @@ def fight_enemy(player,board):
         ui.display_title(f'You have encountered the {enemy_adjective} {enemy["name"]}.')
         if turn == "Enemy":
             ui.display_message(f"It's {turn}'s turn to attack",1)
+            turn = "Player"
         else:
             ui.display_message(f"It's your turn to attack",1)
-        if turn == "Player":
             ui.display_message("Attack  | Use Item",2)
             player_input = input("    ").lower().replace(" ", "")
             if player_input in ["useitem", "u", "i"]:
@@ -545,20 +502,26 @@ def fight_enemy(player,board):
             else:
                 turn = "Enemy"
                 return
-        else:
-            turn = "Player"
+    if enemy["health"] <= 0:
+        player["exp"] += enemy["exp"]
+        if player["exp"] >= 100:
+            player["lvl"] += 1
+            player["exp"] -= 100
+        return "victory"
+    else:
+        return "defeat"
 
-
-    input()
-
-
-def encounter(board, player,player_row, player_col,quest_icon,shop_icon,enemy_icon):
+def encounter(board, player,player_row, player_col,quest_icon,shop_icon,enemy_icon,item_icon):
     if board[player_row][player_col] == quest_icon:
         # quest()
-        return 0
+        return [0]
     elif board[player_row][player_col] == shop_icon:
         # open_shop()
-        return 0
+        return [0]
+    elif board[player_row][player_col] == item_icon:
+        # 
+        return [1]
     elif board[player_row][player_col] == enemy_icon:
-        fight_enemy(player,board)
-        return 1
+        result = fight_enemy(player,board)
+        if result == "victory":
+            return 1
