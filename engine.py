@@ -171,8 +171,6 @@ def find_the_door(board):
 
 def open_the_door(board,player):
     enter_door_row,enter_door_col = find_the_door(board)
-    print(enter_door_row,enter_door_col)
-    util.press_any_button()
     if have_key_in_inventory(player["inventory"]) != False:
         util.clear_screen()
         board[enter_door_row][enter_door_col] =" "
@@ -747,7 +745,6 @@ def interaction_with_traders(player):
         util.clear_screen()
         ui.display_error_message("I don't understand. See you later!".center(119),filler=0)
         util.press_any_button(1,0,True)
-
 
 def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_icon,item_icon,board_level,door_icon):
     if board[player_row][player_col] == quest_icon:
