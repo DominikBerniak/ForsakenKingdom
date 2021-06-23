@@ -26,7 +26,7 @@ def display_board(board):
         print(row)
 
 def display_equipment(player):
-    print("\n\n    Your Equipment")
+    display_title("Your Equipment",4)
     equipment = player["equipment"]
     equipment_headers = ["Head","Chest","Legs","Shoes","Weapon"]
     for i in range(len(equipment_headers)):

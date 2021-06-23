@@ -21,7 +21,7 @@ def create_player(player_start_row, player_start_col, player_icon):
         player_stats = {"name":util.get_input("Your hero's name",1).title()}
         if player_stats["name"] == "Admin":
             player_stats.update({"race":"God" ,"health":1000000,"lvl":1000000,"exp":0,"attack":1000000,
-                                "armor":1000000,"player_location": [player_start_row,player_start_col],"player_icon":player_icon, "inventory":[]})
+                                "armor":1000000,"player_location": [player_start_row,player_start_col],"player_icon":player_icon, "inventory":[],"equipment": []})
             return player_stats
         while True:        
             orc = {"race":"Orc" ,"health":125,"lvl":1,"exp":0,"attack":7,"armor":20}
@@ -48,7 +48,7 @@ def create_player(player_start_row, player_start_col, player_icon):
                 ui.display_error_message("    Wrong race name!")
                 sleep(2)      
         player_stats.update({"player_location": [player_start_row,player_start_col],
-                                "player_icon":player_icon, "inventory": []})
+                                "player_icon":player_icon, "inventory": [],"equipment": []})
         ui.clear_screen()
         if util.get_confirmation(f"""You've created {player_stats["name"]}, the {player_stats["race"]}.
     
@@ -218,42 +218,48 @@ def create_item(is_shop=False):
 
 def authors():
     crew = ["Dawid Kuropka     : Full-Stack Developer",
-            "Kewin Gregorczyk  : Full-Stack Developer",
-            "Kordian Płusa     : Full-Stack Developer",
-            "Jakub Młocek      : Full-Stack Developer",
-            "Dominik Berniak   : Full-Stack Developer"]
-    crew_display = ""
-    i = 0
+        "Kewin Gregorczyk  : Full-Stack Developer",
+        "Kordian Płusa     : Full-Stack Developer",
+        "Jakub Młocek      : Full-Stack Developer",
+        "Dominik Berniak   : Full-Stack Developer"]
     x = 0
+    i = 0
     while x in range(len(crew)*2):
         ui.clear_screen()
-        ui.display_title("            Game authors:\n")
+        ui.display_title("Game authors:".center(119),3,0)
         if x == 0:
-            crew_display = crew[i]
+            crew_display = crew[i].center(119)
         elif x%2 != 0:
-            crew_display = "\n    " + crew_display
+            crew_display = "\n" + crew_display
             i+=1
         else:
-            crew_display = crew[i] + "\n    " + crew_display
-        ui.display_message(crew_display,1)
+            crew_display = crew[i].center(119) + "\n" + crew_display
+        ui.display_message(f"{crew_display}".center(119),2,filler=0)
         sleep(0.2)
         x+=1
-    util.press_any_button(3,8)
+    util.press_any_button(3,0,True)
     util.clear_screen()
 
 def instruction():
     ui.clear_screen()
     information = """Preparation for the game:
-                First you need to create a character. Choose the races responsibly! 
-                Each race has different stats. The character is moved by W/S/A/D. Also \"W\" is
-                to attacking. 
-                Objective:
-                The most important objective is defeating the final boss,
-                but before you get to this stage, you have to defeat a lot of enemies.
-                During your adventure you will meet \"npc\" with whom you can trade,
-                and they can give you a quests."""
-    ui.display_message(information,2)
-    util.press_any_button(2)
+First you need to create a character. Choose the races responsibly!
+Each race has different stats. The character is moved by W/S/A/D.
+Objective:
+The main goal is to defeat the final boss,
+but before you get to this stage, you have to kill a lot of enemies.
+During your adventure you will meet shop npcs marked with "$" with whom you can trade.
+You will also meet quest npcs marked with "?" who will give you tasks to do."""
+    
+    information = information.split("\n")
+    longest_row_lenght = len(max(information,key=len))
+    for i in range(len(information)):
+        filler = (longest_row_lenght-len(information[i]))*" "
+        if i != 0 and i !=3:
+            ui.display_message(f"{information[i]}{filler}".center(119),1,0)
+        else:
+            ui.display_message(f"{information[i]}{filler}".center(119),4,0)
+    util.press_any_button(4,0,True)
     util.clear_screen()
 
 def hall_of_fame():
@@ -529,7 +535,7 @@ def choose_item_to_wear(filtred_inventory,player,number_of_part_equipment):
         ui.display_error_message(f"You not have {item_from_inventory.title()} in item")
         util.press_any_button()
 
-def wear_equipment(board,player):
+def wear_equipment(player):
     while True:
         util.clear_screen()
         ui.display_equipment(player)
@@ -562,7 +568,6 @@ def wear_equipment(board,player):
             player["attack"] += equipment[4]["value"]
         else:
             break
-    ui.display_board(board)
     
 def use_item(player):
     inventory = list(player["inventory"])
@@ -602,8 +607,8 @@ def fight_enemy(player,board):
     turn = random.choice([enemy_turn,player_turn])
 
     util.clear_screen()
-    ui.display_title(f'You have encountered the {enemy["adjective"]} {enemy["name"]}.')
-    util.press_any_button(2)
+    ui.display_title(f'You have encountered the {enemy["adjective"]} {enemy["name"]}.'.center(119),3,0)
+    util.press_any_button(2,0,True)
     while True:
         util.clear_screen()
         ui.display_stats(enemy,board,1," ",5)
@@ -659,7 +664,7 @@ def fight_enemy(player,board):
                 if player["exp"] < 100:
                     break
         util.clear_screen()
-        ui.display_message(f"You have killed the {enemy['adjective']} {enemy['name']} and gained {enemy['exp']} experience".center(len(board[0])),4,0)
+        ui.display_message(f"You have killed the {enemy['adjective']} {enemy['name']} and have gained {enemy['exp']} experience".center(len(board[0])),4,0)
         util.press_any_button(1,0,True)
         return "victory"
     else:
@@ -689,6 +694,8 @@ def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_i
         result = fight_enemy(player,board)
         if result == "victory":
             return [1]
+        elif result == "defeat":
+            return [0,"defeat"]
     elif board[player_row][player_col] == door_icon:
         open_the_door(board, player)
         return [0]

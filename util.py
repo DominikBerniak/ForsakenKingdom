@@ -48,7 +48,11 @@ def press_any_button(new_lines=0,indent=4,center=False):
     else:
         input(f"{new_lines}Press enter to continue! ")
 
-def get_confirmation(message):
-    confirmation = get_input(message,2).lower()
+def get_confirmation(message,new_lines=2):
+    new_lines = "\n" * new_lines
+    print(new_lines)
+    print(f"{message}".center(119))
+    print()
+    confirmation = input("".rjust(119//2)).lower()
     return confirmation in ["yes", "y"]
         
