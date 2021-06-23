@@ -62,9 +62,8 @@ def create_player(player_start_row, player_start_col, player_icon):
 def is_unoccupied(board,row,col):
     return board[row][col] == " " or board[row][col] == "O"
 
-def is_not_wall(board, row, col,door_icon):
-    return (board[row][col] != "=" and board[row][col] != "|" 
-            and board[row][col] != door_icon)
+def is_not_wall(board, row, col):
+    return (board[row][col] != "=" and board[row][col] != "|")
 
 def get_player_placement(board, player_icon):
     for i in range(len(board)):
@@ -109,10 +108,31 @@ def put_door_on_board(board,door_icon):
         else:
             enter_door_col = random.choice([0, len(board[i][0])-1])
         if i < len(board)-1:
-            board[i][enter_door_row][enter_door_col] = " " #door_icon
+            board[i][enter_door_row][enter_door_col] = door_icon
         exit_door_row, exit_door_col = get_next_level_old_door_location(board[0], enter_door_row, enter_door_col)
         if i < len(board)-1:
             board[i+1][exit_door_row][exit_door_col] = "O" #open door
+
+def find_the_door(board):
+    for row in range(len(board)):
+        for col in range(len(board[0])):
+            if board[row][col] == "X":
+                return row,col
+
+def open_the_door(board,player):
+    enter_door_row,enter_door_col = find_the_door(board)
+    print(enter_door_row,enter_door_col)
+    util.press_any_button()
+    if have_key_in_inventory(player["inventory"]) != False:
+        util.clear_screen()
+        board[enter_door_row][enter_door_col] =" "
+        ui.display_board(board)
+    else:
+        util.clear_screen()
+        ui.display_message("Not have a key!!! Go find it!!")
+        util.press_any_button()
+        ui.display_board(board)
+        
 
 def put_npc_quest_on_board(board,npc_quest_icon):
     for i in range(len(board)):
@@ -354,9 +374,11 @@ def create_adalbert():
     return adalbert
 
 def have_key_in_inventory(inventory):
+    index =0
     for item in inventory:
         if item["type"] == "Key":
-            return True
+            return index
+        index += 1
     return False
 
 def do_quest(board,player,board_lvl):
@@ -535,6 +557,7 @@ def wear_equipment(board,player):
     
 def fight_enemy(player):
     util.clear_screen()
+
 def use_item(player):
     inventory = list(player["inventory"])
     inventory_to_display = [inventory[i] for i in range(len(inventory)) if inventory[i]["type"] == "Health"]
@@ -601,9 +624,9 @@ def fight_enemy(player,board):
     else:
         return "defeat"
 
-def encounter(board, player,player_row, player_col,quest_icon,shop_icon,enemy_icon,item_icon,board_lvl):
+def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_icon,item_icon,board_level,door_icon):
     if board[player_row][player_col] == quest_icon:
-        do_quest(board,player,board_lvl)
+        do_quest(board,player,board_level)
         return [0]
     elif board[player_row][player_col] == shop_icon:
         # open_shop()
@@ -615,3 +638,6 @@ def encounter(board, player,player_row, player_col,quest_icon,shop_icon,enemy_ic
         result = fight_enemy(player,board)
         if result == "victory":
             return 1
+    elif board[player_row][player_col] == door_icon:
+        open_the_door(board, player)
+        return[0]
