@@ -2,6 +2,7 @@ import random
 import util
 import ui
 from time import sleep
+from importlib import reload
 
 def create_board(width, height):
     board = [[" " for x in range(width)]for y in range(height)]
@@ -55,6 +56,58 @@ def create_player(player_start_row, player_start_col, player_icon):
     Do you want to play as {player_stats["name"]}? (yes/no)"""):
             break
     return player_stats
+
+def save_game(player, boards, board_level):
+    with open("saved_games.py","w") as save_file:
+        save_file.write(f"player = {player}\nboards = {boards}\nboard_level = {board_level[0]}")
+
+def load_game(player, boards, board_level):
+    try:
+        import saved_games
+        reload(saved_games)
+        player.update(saved_games.player)
+        boards[:] = saved_games.boards
+        board_level[0] = saved_games.board_level
+    except:
+        util.clear_screen()
+        ui.display_error_message("There are no saved games".center(119),3,0)
+        util.press_any_button(2,0,True)
+        util.clear_screen()
+
+def create_pause_menu():
+    options = ["Exit game",
+               "Resume game",
+               "Save game",
+               "Load game",
+               "Go back to main menu"]
+    ui.display_menu("Game paused", options)
+
+def pause_menu(player, boards, board_level):
+    while True:
+        create_pause_menu()
+        try:
+            option = util.get_input("Select option".rjust(130//2),1,0)
+            if option == "0":
+                return "exit_game"
+            elif option == "1":
+                return
+            elif option == "4":
+                return "back_to_menu"
+            elif option == "2":
+                return save_game(player, boards, board_level)
+            elif option == "3":
+                return load_game(player, boards, board_level)
+        except KeyError:
+            util.clear_screen()
+            ui.display_error_message("There is no such option!".center(119),3,0)
+            util.press_any_button(2,0,True)
+            util.clear_screen()
+            
+        except ValueError:
+            util.clear_screen()
+            ui.display_error_message("Please enter a number!\n".center(119),3,0)
+            util.press_any_button(2,0,True)
+            util.clear_screen()
 
 def is_unoccupied(board,row,col):
     return board[row][col] == " " or board[row][col] == "O"
@@ -195,7 +248,7 @@ def create_item(is_shop=False):
     consumable = ["Ham","Cheese","Elixir","Bread","Water"]
     consumable_description = ["Stinky","Tasty","Godlike"]
     if not is_shop:
-        type = ["Weapons","Weapons","Weapons","Armor","Armor","Health","Gold"]
+        type = ["Weapons","Weapons","Armor","Armor","Health","Gold","Gold","Gold"]
     else:
         type = ["Weapons","Weapons","Weapons","Armor","Armor","Health","Health"]
 
@@ -303,14 +356,14 @@ def menu():
 
         except KeyError:
             util.clear_screen()
-            ui.display_error_message("There is no such option!\n")
-            util.press_any_button(1)
+            ui.display_error_message("There is no such option!".center(119),3,0)
+            util.press_any_button(2,0,True)
             util.clear_screen()
             
         except ValueError:
             util.clear_screen()
-            ui.display_error_message("Please enter a number!\n")
-            util.press_any_button(1)
+            ui.display_error_message("Please enter a number!".center(119),3,0)
+            util.press_any_button(2,0,True)
             util.clear_screen()
 
 def create_npc(name,cost_item,amount_items_in_shop):
@@ -400,16 +453,12 @@ def do_quest(board,player,board_lvl):
             add_to_inventory(player,reward)
         else:
             ui.display_message(npc["name"]+": "+"uuh, sry you must still learn this")
-        util.press_any_button()
     else:
-        ui.display_message(npc["name"]+": "+"uuh, sry you must still learn this")
+        ui.display_message(npc["name"]+": "+"You have the key already!")
     
     util.press_any_button()
-    reward = npc["reward"]
-
-    add_to_inventory(player,reward)
-    util.clear_screen()
-    ui.display_board(board)
+    # reward = npc["reward"]
+    # add_to_inventory(player,reward)
 
 def add_to_inventory(player, added_items):
     inventory = player["inventory"]
@@ -599,6 +648,19 @@ def use_item(player):
         util.press_any_button(2,center=True)
         return False
 
+def add_random_item_to_inventory(player):
+    random_item = create_item()
+    if random_item["type"] == "Gold":
+        added_gold = False
+        for i in range(len(player["inventory"])):
+            if player["inventory"][i]["type"] == "Gold":
+                player["inventory"][i]["value"] += random_item["value"]
+                added_gold = True
+        if not added_gold:
+            player["inventory"].append(random_item)
+    else:
+        player["inventory"].append(random_item)
+    return random_item
 
 def fight_enemy(player,board):
     enemy = create_enemy(player)
@@ -663,8 +725,12 @@ def fight_enemy(player,board):
                 player["exp"] -= 100
                 if player["exp"] < 100:
                     break
+        dropped_item = add_random_item_to_inventory(player)
         util.clear_screen()
-        ui.display_message(f"You have killed the {enemy['adjective']} {enemy['name']} and have gained {enemy['exp']} experience".center(len(board[0])),4,0)
+        if dropped_item["name"] != "Gold":
+            ui.display_message(f"You have killed the {enemy['adjective']} {enemy['name']}, have gained {enemy['exp']} exp and have picked up {dropped_item['name']}".center(len(board[0])),4,0)
+        else:
+            ui.display_message(f"You have killed the {enemy['adjective']} {enemy['name']}, have gained {enemy['exp']} exp and have picked up {dropped_item['value']} {dropped_item['name']}".center(len(board[0])),4,0)
         util.press_any_button(1,0,True)
         return "victory"
     else:
@@ -700,5 +766,12 @@ def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_i
         open_the_door(board, player)
         return [0]
     elif board[player_row][player_col] == item_icon:
-        #collect_item
+        item = add_random_item_to_inventory(player)
+        util.clear_screen()
+        if item["name"] != "Gold":
+            ui.display_message(f"You have picked up {item['name']}.".center(119),3,0)
+        else:
+            ui.display_message(f"You have picked up {item['value']} {item['name'].lower()}.".center(119),3,0)
+        util.press_any_button(1,0,True)
+        util.clear_screen()
         return [1]

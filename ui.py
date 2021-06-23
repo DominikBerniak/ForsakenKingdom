@@ -132,21 +132,43 @@ def display_race_choices(races):
 def display_inventory(inventory, lable = "Inventory:\n"):
     # inventory = [{'type': str, 'name': str, 'value': int}, ...]
     inventory = sorted(inventory, key=lambda x: x["type"])
-    longest_name = 0
-    longest_type = 0 
-    for i in range(len(inventory)):
-        if len(inventory[i]["name"]) > longest_name:
-            longest_name = len(inventory[i]["name"])
-        elif len(inventory[i]["type"]) > longest_type:
-            longest_type = len(inventory[i]["type"])
+    longest_name = len(inventory[0]["name"])
+    longest_type = len(inventory[0]["type"])
+    longest_value = len(str(inventory[0]["value"]))
+    is_gold_in_inventory = False
+    if len(inventory) > 1:
+        for i in range(len(inventory)):
+            if len(inventory[i]["name"]) > longest_name:
+                longest_name = len(inventory[i]["name"])
+            elif len(inventory[i]["type"]) > longest_type:
+                longest_type = len(inventory[i]["type"])
+            elif len(str(inventory[i]["value"])) > longest_value:
+                longest_value = len(str(inventory[i]["value"]))
+    else:
+        longest_name = len(inventory[0]["name"])
+        longest_type = len(inventory[0]["type"])
+        longest_value = len(str(inventory[0]["value"]))
+
     clear_screen()
-    display_title(f"{lable}".center(119),filler=0)
+    display_title(f"{lable}".center(119),3,filler=0)
     for i in range(len(inventory)):
         name_lenght = len(inventory[i]["name"])
         type_lenght = len(inventory[i]["type"])
+        value_lenght = len(str(inventory[i]["value"]))
         filler_name = (longest_name - name_lenght + 2)*" "
         filler_type = (longest_type - type_lenght + 2)*" "
-        display_message(f"{inventory[i]['name']}{filler_name}:  {inventory[i]['type']}{filler_type}=  {inventory[i]['value']}".center(119),1,filler=0)
+        filler_value = (longest_value - value_lenght + 2)*" "
+        if inventory[i]["name"] != "Gold":
+            display_message(f"{inventory[i]['name']}{filler_name}:  {inventory[i]['type']}{filler_type}=  {inventory[i]['value']}{filler_value}".center(119),1,filler=0)
+        else:
+            is_gold_in_inventory = True
+            gold = inventory[i]
+    if is_gold_in_inventory:
+        gold_filler_name = (longest_name + 2)*" "
+        gold_filler_type = (longest_type - len(gold["type"]) + 2)*" "
+        gold_filler_value = (longest_value - len(str(gold["value"])) + 2)*" "
+        print()
+        display_message(f"{gold_filler_name}   {gold['type']}{gold_filler_type}=  {gold['value']}{gold_filler_value}".center(119),1,filler=0)
 
 
 """ASCI ART"""
