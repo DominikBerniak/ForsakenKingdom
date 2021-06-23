@@ -55,7 +55,7 @@ def main():
             util.clear_screen()
             engine.put_player_on_board(board[board_level], player, PLAYER_ICON)
             ui.display_board(board[board_level])
-            ui.display_stats(player,board[board_level])
+            ui.display_stats(player,board[board_level],2)
             player_location_row, player_location_col = player["player_location"]
 
             key = util.key_pressed()
@@ -101,7 +101,7 @@ def main():
 
             elif key == "i":
                 ui.display_inventory(player["inventory"])
-                util.press_any_button(4)
+                util.press_any_button(2,center=True)
             elif key =="p":
                 npc = engine.create_npc("Hilary Pilton",15,6)
                 engine.sell_from_inventory(player,board[board_level])

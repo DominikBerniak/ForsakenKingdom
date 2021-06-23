@@ -20,7 +20,7 @@ def create_player(player_start_row, player_start_col, player_icon):
         ui.display_title("Create your hero")
         player_stats = {"name":util.get_input("Your hero's name",1).title()}
         if player_stats["name"] == "Admin":
-            player_stats.update({"race":"God" ,"health":1000000,"lvl":1000000,"exp":1000000,"attack":1000000,
+            player_stats.update({"race":"God" ,"health":1000000,"lvl":1000000,"exp":90,"attack":1000000,
                                 "armor":1000000,"player_location": [player_start_row,player_start_col],"player_icon":player_icon, "inventory":[]})
             return player_stats
         while True:        
@@ -376,18 +376,28 @@ def update_gold_in_inventory(inventory,amount_of_gold):
                 inventory[index]["value"] += amount_of_gold
                 
 def create_enemy(player):
-    #format MARKER, ATK, MIN HP, MAX HP, ARMOR, EXP
+    skeleton = {"adjective": "","name":"Skeleton","health":[5,50],"attack": 10,"armor":75, "exp": 10}
+    ghoul = {"adjective": "","name":"Ghoul","health":[15,50],"attack": 20,"armor":5, "exp": 15}
+    boar = {"adjective": "","name":"Boar","health":[50,200],"attack": 10,"armor":40, "exp": 25}
+    spider = {"adjective": "","name":"Spider","health":[10,50],"attack": 15,"armor":20, "exp": 15}
+    ghost = {"adjective": "","name":"Ghost","health":[1,5],"attack": 3,"armor":100, "exp": 5}
+    ogre = {"adjective": "","name":"Ogre","health":[20,75],"attack": 25,"armor":100, "exp": 75}
+    enemy = random.choice([skeleton, ghoul, boar, spider, ghost, ogre])
+
+    enemy_adjectives = ["Mighty", "Fearless", "Powerful", "Deadly", "Ferocious", "Horrifying", "Frightening", "Spooky", "Ghostly"]
+    enemy_adjective = random.choice(enemy_adjectives)
+    if enemy["name"] == "Skeleton":
+        enemy_adjective = random.choice([enemy_adjective, "Scary Spooky"])
+    enemy["adjective"] = enemy_adjective
+    
     player_level = player["lvl"]
-    enemies = {"Skeleton":["╥",10,5,50,75, 10], "Ghoul":["╓",20,15,50,5,15], "Boar":["╖", 10, 50, 200,40,25],
-                 "Spider":["╫", 15,10,50,20,15],"Ghost":["░",3,1,5,100,5], "Ogre":["V",25,20,75,100,75]}
-    random_enemy = random.choice(list(enemies.items()))
-    marker,atack, min_hp, max_hp, armor, exp = random_enemy[1]
     if player_level < 5: 
-        max_hp = max_hp//2
-        armor = armor//2
-    health = random.randint(min_hp, max_hp)
-    enemy = {"name": random_enemy[0],"enemy_icon":marker,"attack":atack,"health": health,"armor": armor,"exp":exp}
+        enemy["health"][1] = enemy["health"][1]//2
+        enemy["armor"] = enemy["armor"]//2
+    enemy["health"] = random.randint(enemy["health"][0],enemy["health"][1])
+
     return enemy
+
 
 def sell_from_inventory(player):
     unsold_items = ["gold","torch","key"]
@@ -453,7 +463,9 @@ def use_item(player):
             util.clear_screen()
             ui.display_inventory(inventory_to_display,"Consumables:\n")
             was_item_used = False
-            player_input = util.get_input("What do you want to use?\n\n    (name of item / return)",4).title()
+            ui.display_message("What do you want to use?".center(119),4,filler=0)
+            ui.display_message("(name of item / return)\n".center(120),1,filler=0)
+            player_input = input("".rjust(119//2)).title()
             if player_input == "Return":
                 return False
             for i in range(len(inventory)):
@@ -465,48 +477,83 @@ def use_item(player):
             if was_item_used:
                 return was_item_used
             else:
-                ui.display_error_message("No such item in your inventory", 4)
-                util.press_any_button(1)
+                ui.display_error_message("No such item in your inventory".center(119), 4,0)
+                util.press_any_button(2,center=True)
     else:
         util.clear_screen()
-        ui.display_error_message("There are no consumables in your inventory",4)
-        util.press_any_button(1)
+        ui.display_error_message("There are no consumables in your inventory".center(119),4,0)
+        util.press_any_button(2,center=True)
         return False
 
 
 def fight_enemy(player,board):
     enemy = create_enemy(player)
-    enemy_adjectives = ["Mighty", "Fearless", "Powerful", "Deadly", "Ferocious", "Horrifying", "Frightening", "Spooky", "Ghostly"]
-    enemy_adjective = random.choice(enemy_adjectives)
-    if enemy["name"] == "Skeleton":
-        enemy_adjective = random.choice([enemy_adjective, "Scary Spooky"])
+    enemy["exp"] = 10
     enemy_turn = "Enemy"
     player_turn = "Player"
-    turn = random.choice([enemy_turn,player_turn])
+    # turn = random.choice([enemy_turn,player_turn])
+    turn = player_turn
 
-    while enemy["health"]>0 or player["health"]>0:
+    util.clear_screen()
+    ui.display_title(f'You have encountered the {enemy["adjective"]} {enemy["name"]}.')
+    util.press_any_button(2)
+    while True:
         util.clear_screen()
-        ui.display_stats(player,board)
-        ui.display_title(f'You have encountered the {enemy_adjective} {enemy["name"]}.')
-        if turn == "Enemy":
-            ui.display_message(f"It's {turn}'s turn to attack",1)
-            turn = "Player"
+        ui.display_stats(enemy,board,1," ",5)
+        ui.display_fight_art(board)
+        ui.display_stats(player,board,1)
+
+        #enemy turn
+        if turn == enemy_turn:
+            ui.display_message(f"It's {turn.lower()}'s turn to attack".center(len(board[0])),2,0)
+            sleep(1.5)
+            enemy_max_damage = (enemy["attack"] - player["armor"])
+            if enemy_max_damage > 0:
+                enemy_damage = random.randint(1,enemy_max_damage)
+                player["health"] -= enemy_damage
+            else:
+                enemy_damage = 0
+            ui.display_message(f"{enemy['name']} did {enemy_damage} damage".center(len(board[0])),2,filler=0)
+            util.press_any_button(1,0,True)
+            util.clear_screen()
+            turn = player_turn
+
+        #player turn
         else:
-            ui.display_message(f"It's your turn to attack",1)
-            ui.display_message("Attack  | Use Item",2)
-            player_input = input("    ").lower().replace(" ", "")
+            ui.display_message(f"It's your turn to attack".center(len(board[0])),4,0)
+            ui.display_message("Attack | Use Item\n".center(len(board[0])),2,0)
+            player_input = input("".rjust(len(board[0])//2)).lower().replace(" ", "")
             if player_input in ["useitem", "u", "i"]:
                 did_use_item = use_item(player)
                 if did_use_item:
-                    turn = "Enemy"            
+                    turn = enemy_turn
             else:
-                turn = "Enemy"
-                return
+                player_max_damage = (player["attack"] - enemy["armor"])
+                if player_max_damage > 0:
+                    player_damage = random.randint(1,player_max_damage)
+                    enemy["health"] -= player_damage
+                else:
+                    player_damage = 0
+                if enemy["health"] > 0:
+                    ui.display_message(f"You did {player_damage} damage".center(len(board[0])),2,filler=0)
+                    util.press_any_button(1,0,True)
+                    util.clear_screen()
+                    turn = enemy_turn
+
+        if enemy["health"]<=0 or player["health"]<=0:
+            break
+
     if enemy["health"] <= 0:
         player["exp"] += enemy["exp"]
         if player["exp"] >= 100:
-            player["lvl"] += 1
-            player["exp"] -= 100
+            while True:
+                player["lvl"] += 1
+                player["exp"] -= 100
+                if player["exp"] < 100:
+                    break
+        util.clear_screen()
+        ui.display_message(f"You have killed the {enemy['adjective']} {enemy['name']} and gained {enemy['exp']} experience".center(len(board[0])),4,0)
+        util.press_any_button(1,0,True)
         return "victory"
     else:
         return "defeat"
@@ -524,4 +571,6 @@ def encounter(board, player,player_row, player_col,quest_icon,shop_icon,enemy_ic
     elif board[player_row][player_col] == enemy_icon:
         result = fight_enemy(player,board)
         if result == "victory":
-            return 1
+            return [1]
+        else:
+            return [0,"defeat"]

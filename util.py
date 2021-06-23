@@ -32,15 +32,19 @@ def clear_screen():
     else:
         os.system('clear')
 
-def get_input(label,new_lines=2):
+def get_input(label,new_lines=2,filler=4):
     new_lines = "\n" * new_lines
-    user_input = input(f"{new_lines}    {label}: ")
+    user_input = input(f"{new_lines}{filler*' '}{label}: ")
     return user_input
 
-def press_any_button(new_lines = 0,indent=4):
+def press_any_button(new_lines=0,indent=4,center=False):
     new_lines = "\n" * new_lines
     if os.name == "nt":
-        print(f"{new_lines}{indent*' '}Press any key to continue . . .")    
+        if not center:
+            print(f"{new_lines}{indent*' '}Press any key to continue . . .")    
+        else:
+            print(new_lines)
+            print(f"Press any key to continue . . .".center(119))    
         os.system("pause >nul")
     else:
         input(f"{new_lines}Press enter to continue! ")
