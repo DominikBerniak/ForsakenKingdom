@@ -3,6 +3,7 @@ import engine
 import ui
 import os
 from time import sleep
+import winsound
 
 PLAYER_ICON = '@'
 CLOSED_DOOR_ICON = 'X'
@@ -66,6 +67,7 @@ def main():
             elif key == "w" and engine.is_not_wall(board[board_level], player_location_row-1, player_location_col,CLOSED_DOOR_ICON):
                 if engine.is_unoccupied(board[board_level],player_location_row-1,player_location_col):
                     player["player_location"][0] -= 1
+                    winsound.Beep(150,100)
                 else:
                     player_encounter = engine.encounter(board[board_level], player,player_location_row-1,player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON)
                     player["player_location"][0] -= player_encounter[0]
@@ -75,6 +77,7 @@ def main():
             elif key == "s" and engine.is_not_wall(board[board_level], player_location_row+1, player_location_col,CLOSED_DOOR_ICON):
                 if engine.is_unoccupied(board[board_level],player_location_row+1,player_location_col):
                     player["player_location"][0] += 1
+                    winsound.Beep(150,100)
                 else:
                     player_encounter = engine.encounter(board[board_level], player,player_location_row+1, player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON)
                     player["player_location"][0] += player_encounter[0]
@@ -84,6 +87,7 @@ def main():
             elif key == "a" and engine.is_not_wall(board[board_level], player_location_row, player_location_col-1,CLOSED_DOOR_ICON):
                 if engine.is_unoccupied(board[board_level],player_location_row,player_location_col-1):
                     player["player_location"][1] -= 1 
+                    winsound.Beep(150,100)
                 else:
                     player_encounter = engine.encounter(board[board_level], player,player_location_row,player_location_col-1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON) 
                     player["player_location"][1] -= player_encounter[0]
@@ -93,6 +97,7 @@ def main():
             elif key == "d" and engine.is_not_wall(board[board_level], player_location_row, player_location_col+1,CLOSED_DOOR_ICON):
                 if engine.is_unoccupied(board[board_level],player_location_row,player_location_col+1):
                     player["player_location"][1] += 1 
+                    winsound.Beep(150,100)
                 else:
                     player_encounter = engine.encounter(board[board_level], player,player_location_row,player_location_col+1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON) 
                     player["player_location"][1] += player_encounter[0]
