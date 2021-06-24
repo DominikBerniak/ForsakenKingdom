@@ -22,7 +22,7 @@ BOARD_HEIGHT = 30
 def player_dead(player):
     util.clear_screen()
     ui.display_title("You are dead")
-    ui.display_message(f"You have achieved {player['lvl']} hero level.",2)
+    ui.display_message(f"You have achieved {player['lvl']} level.",2)
     util.press_any_button(4)
     return main()
 
@@ -36,9 +36,10 @@ def quit():
 def main():
     util.clear_screen()
     option = engine.menu()
-    if option == "start_game":
-        util.clear_screen()
-        player = engine.create_player(PLAYER_START_ROW,PLAYER_START_COL,PLAYER_ICON)
+    if option == "start_game" or option == "load_game":
+        if option == "start_game":
+            util.clear_screen()
+            player = engine.create_player(PLAYER_START_ROW,PLAYER_START_COL,PLAYER_ICON)
         boards = [engine.create_board(BOARD_WIDTH, BOARD_HEIGHT),engine.create_board(BOARD_WIDTH, BOARD_HEIGHT),engine.create_board(BOARD_WIDTH, BOARD_HEIGHT)]
         board_level = [0]
         engine.put_door_on_board(boards,CLOSED_DOOR_ICON)
@@ -46,10 +47,12 @@ def main():
         engine.put_npc_quest_on_board(boards,NPC_QUEST_ICON)
         engine.put_enemy_on_board(boards,ENEMY_ICON)
         engine.put_item_on_board(boards,ITEM_ICON)
-        
+
+        if option == "load_game":
+            player = {}
+            engine.load_game(player, boards, board_level)
         while True:
             util.clear_screen()
-            print(board_level[0])
             engine.put_player_on_board(boards[board_level[0]], player, PLAYER_ICON)
             ui.display_board(boards[board_level[0]])
             ui.display_stats(player,boards[board_level[0]],2)
@@ -60,6 +63,7 @@ def main():
                 ui.clear_screen()
                 pause_option = engine.pause_menu(player, boards, board_level)
                 if pause_option == "exit_game":
+                    util.clear_screen()
                     if util.get_confirmation("Do you really want to quit the game? (yes/no)"):
                         return quit()
                 elif pause_option == "back_to_menu":
