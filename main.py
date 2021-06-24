@@ -49,6 +49,7 @@ def quit():
     ui.clear_screen()
 
 def main():
+    winsound.PlaySound("sounds/menu.wav",winsound.SND_ASYNC)
     util.clear_screen()
     option = engine.menu()
     if option == "start_game" or option == "load_game":
@@ -67,10 +68,13 @@ def main():
         boards.append(boss_level)
         engine.put_door_on_board(boards,CLOSED_DOOR_ICON)
         engine.put_boss_on_board(boards[BOSS_LEVEL],BOSS_ICON)
+        
+        
 
         if option == "load_game":
             player = {}
             engine.load_game(player, boards, board_level)
+        winsound.PlaySound("sounds/first_map.wav",winsound.SND_ASYNC)
         while True:
             util.clear_screen()
             engine.put_player_on_board(boards[board_level[0]], player, PLAYER_ICON)
@@ -169,7 +173,8 @@ def main():
             if player_location_row in board_walls["rows"] or player_location_col in board_walls["cols"]:
                 if board_level[0] == 0:
                     player["player_location"] = engine.player_location_after_door(boards[board_level[0]],player_location_row,player_location_col)
-                    board_level[0] = 1                    
+                    board_level[0] = 1
+                    winsound.PlaySound("sounds/second_map.wav",winsound.SND_ASYNC)                 
                 elif board_level[0] == 2:
                     if boards[board_level[0]][player_location_row][player_location_col] == OPEN_EXIT_DOOR_ICON:
                         player["player_location"] = [1,58]
@@ -181,9 +186,14 @@ def main():
                     if boards[board_level[0]][player_location_row][player_location_col] == OPEN_EXIT_DOOR_ICON and not escaped_cave:
                         player["player_location"] = engine.player_location_after_door(boards[board_level[0]],player_location_row,player_location_col)
                         board_level[0] -= 1
-                    elif board_level[0] == 1 and escaped_cave:
+                        if board_level[0] == 0:
+                            winsound.PlaySound("sounds/first_map.wav",winsound.SND_ASYNC) 
+                        if board_level[0] == 1:
+                            winsound.PlaySound("sounds/second_map.wav",winsound.SND_ASYNC)
+                    elif board_level[0] == 1 and escaped_cave: #reentering cave
                         player["player_location"] = [30,58]
                         board_level[0] += 1
+                        winsound.PlaySound("sounds/cave.wav",winsound.SND_ASYNC) 
                     else:
                         if board_level[0] != 1:
                             player["player_location"] = engine.player_location_after_door(boards[board_level[0]],player_location_row,player_location_col)
@@ -191,6 +201,7 @@ def main():
                             player["player_location"] = [15,58]
                             if not escaped_cave:
                                 util.clear_screen()
+                                winsound.PlaySound("sounds/cave.wav",winsound.SND_ASYNC)
                                 ui.display_message("You have fallen into the cave".center(119),3,0)
                                 util.press_any_button(2,0,True)
                                 escaped_cave = True
