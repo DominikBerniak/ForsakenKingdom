@@ -58,7 +58,11 @@ def main():
         if option == "start_game":
             util.clear_screen()
             player = engine.create_player(PLAYER_START_ROW,PLAYER_START_COL,PLAYER_ICON)
-            engine.story("begin_story.txt",player)
+            if player["name"] != "Admin":
+                engine.story("begin_story.txt",player)    
+                ui.display_message("You are entering the Forsaken Kingdom".center(119),4,0)
+                util.press_any_button(2,0,True)
+                util.clear_screen()
         boards = [level_1,level_2,level_3]
         board_level = [0]
         sound_on = [1]

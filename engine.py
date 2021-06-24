@@ -1,3 +1,4 @@
+from os import closerange
 import random
 import util
 import ui
@@ -377,8 +378,8 @@ def authors():
     util.clear_screen()
 
 def story(filename,player):
-    file = open(filename,"r")
-    story = file.readlines()
+    with open(filename,"r") as file:
+        story = file.readlines()
     x = 0
     i = 0
     while x in range(len(story)*2):
@@ -389,13 +390,13 @@ def story(filename,player):
             story_display = "\n" + story_display
             i+=1
         else:
-            story_display = story[i].center(119) + "\n" + story_display
-        ui.display_message(f"{story_display}".replace("NAME",player["name"].upper()).center(119),2,filler=0)
-        sleep(0.2)
+            story_display = story[i].center(119) + story_display
+        ui.display_message(f"{story_display}".replace("NAME",player["name"].upper()).center(119),4,0)
+        sleep(0.8)
         x+=1
-
-    util.press_any_button(3,0,True)
+    util.press_any_button(2,0,True)
     util.clear_screen()
+
 def instruction():
     ui.clear_screen()
     information = """Preparation for the game:
@@ -545,8 +546,8 @@ def create_peter():
     peter = {
         "icon": "?",
         "name":"Peter Iscoming",
-        "quest_description":"You must correct answer to my question",
-        "quest":"What is the name of command to add one or more files to the staging area?",
+        "quest_description": "You have to correctly answer my question",
+        "quest":"What is the name of a command that adds one or more files to the staging area?",
         "answer": "git add",
         "reward": create_torch(),
         "is_done": False
@@ -557,8 +558,8 @@ def create_kate():
     kate = {
         "icon": "?",
         "name": "Kate Antlish",
-        "quest_description": "You must correct answer to my question",
-        "quest": "How reversed string where variable name word?",
+        "quest_description": "You have to correctly answer my question",
+        "quest": "How to reverse a string with variable name: \"word?\"",
         "answer":"word[::-1]",
         "reward":create_key(),
         "is_done": False
@@ -569,9 +570,9 @@ def create_adalbert():
     adalbert = {
         "icon":"?",
         "name": "Adalbert Gribbs",
-        "quest_description": "You must correct answer to my question",
-        "quest": "What is a StackOverflow? ",
-        "answer":"error",
+        "quest_description": "You have to correctly answer my question",
+        "quest": "What is StackOverflow? ",
+        "answer":"i dont know",
         "reward":create_key(),
         "is_done": False
     }
@@ -592,20 +593,23 @@ def do_quest(player,board_lvl):
         npc = create_adalbert()
     if not have_key_in_inventory(player["inventory"]) or npc["is_done"]:
         util.clear_screen()
-        ui.display_message(npc["name"] + ": "+npc["quest_description"])
-        answer = util.get_input(npc["name"]+": "+npc["quest"]).lower()
+        ui.display_message(f"{npc['name']} : {npc['quest_description']}".center(119),3,0)
+        ui.display_message(f"{npc['name']} : {npc['quest']}".center(119),3,0)
+        print("\n")
+        answer = input("".rjust(119//2)).lower()
         reward = npc["reward"]
 
         if answer == npc["answer"]:
-            ui.display_message(npc["name"]+": "+"Correct, you got a key!!")
+            util.clear_screen()
+            ui.display_message(f"{npc['name']} : Correct. Here is your key".center(119),3,0)
             add_to_inventory(player,reward)
         else:
-            ui.display_message(npc["name"]+": "+"uuh, sry you must still learn this")
+            util.clear_screen()
+            ui.display_message(f"{npc['name']} : Wrong answer".center(119),3,0)
     else:
         util.clear_screen()
-        ui.display_message(npc["name"]+": "+"You have the key already!")
-    
-    util.press_any_button()
+        ui.display_message(f"{npc['name']} : You have the key already".center(119),3,0)    
+    util.press_any_button(2,0,True)
 
 def add_to_inventory(player, added_items):
     inventory = player["inventory"]
@@ -662,10 +666,17 @@ def create_enemy(player):
 def sell_from_inventory(player):
     unsold_items = ["gold","torch","key"]
     while True:
+        if len(player["inventory"]) < 2:
+            util.clear_screen()
+            ui.display_message("You don't have anything to sell".center(119),3,0)
+            util.press_any_button(2,0,True)
+            break
         ui.display_inventory(player["inventory"])
-        name_item_to_sell = util.get_input("What you want sell").lower()
+        ui.display_message("What do you want to sell?".center(119),3,0)
+        print("\n")
+        name_item_to_sell = input("".rjust(119//2)).lower()
         index = 0
-        if name_item_to_sell == "return":
+        if name_item_to_sell in ["return",""]:
             break
         if name_item_to_sell in unsold_items:
             continue
@@ -682,12 +693,15 @@ def sell_from_inventory(player):
             else:
                 util.clear_screen()
                 ui.display_message("Your inventory is empty.".center(119),3,0)
-            util.press_any_button(4,0,True)
+            util.press_any_button(3,0,True)
 
         except IndexError:
-            ui.display_error_message(f"You don't have {name_item_to_sell.title()}")
+            util.clear_screen()
+            ui.display_error_message(f"You don't have {name_item_to_sell.title()}".center(119),3,0)
+            util.press_any_button(3,0,True)
         
-        if util.get_confirmation("Wanna sell somthing else?"):
+        util.clear_screen()
+        if util.get_confirmation("Wanna sell somthing else?".center(119),3):
             util.clear_screen()
         else:
             break
@@ -697,8 +711,10 @@ def buy_from_shop(player,npc):
     while True:
         ui.display_inventory(shop)
         index = 0
-        name_item_to_buy = util.get_input("Want you buy something?").lower()
-        if name_item_to_buy == "return":
+        ui.display_message("What do you want to buy?".center(119),2,0)
+        print("\n")
+        name_item_to_buy = input("".rjust(119//2)).lower()
+        if name_item_to_buy in ["return",""]:
             break
         for item in shop:
             if name_item_to_buy == item["name"].lower():
@@ -717,13 +733,15 @@ def buy_from_shop(player,npc):
             util.press_any_button(4,0,True)
 
         except IndexError:
-            ui.display_error_message(f"I don't have {name_item_to_buy.title()}")
+            util.clear_screen()
+            ui.display_error_message(f"I don't have {name_item_to_buy.title()}".center(119),3,0)
             util.press_any_button(4,0,True)
         except ValueError:
-            ui.display_error_message(f"You don't have money to buy this")
+            util.clear_screen()
+            ui.display_error_message(f"You don't have money to buy this".center(119),3,0)
             util.press_any_button(4,0,True)
-
-        if util.get_confirmation("Wanna buy something else?"):
+        util.clear_screen()
+        if util.get_confirmation("Wanna buy something else?".center(119),3):
             util.clear_screen()
         else:
             break
@@ -934,15 +952,19 @@ def interaction_with_traders(player,board_level):
     npcs = [shop_level_1,shop_level_2,shop_level_3]
     while True:
         ui.clear_screen()
-        sell_or_buy = util.get_input(f"{npcs[board_level]['name']}: Do you want to buy or sell something?".center(119),2,0).lower()
+        ui.display_message(f"{npcs[board_level]['name']}: Do you want to buy or sell something?".center(119),3,0)
+        print("\n")
+        sell_or_buy = input("".rjust(119//2)).lower()
         if sell_or_buy == "sell":
             sell_from_inventory(player)
         elif sell_or_buy == "buy":
             buy_from_shop(player,npcs[board_level])
+        elif sell_or_buy in ["return", ""]:
+            return
         else:
             util.clear_screen()
-            ui.display_error_message(f"{npcs[board_level]['name']}: I don't understand. See you later!".center(119),filler=0)
-            util.press_any_button(1,0,True)
+            ui.display_error_message(f"{npcs[board_level]['name']}: I don't understand. See you later!".center(119),3,0)
+            util.press_any_button(2,0,True)
             break
 
 def get_boss_location(board,boss_icon):
