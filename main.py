@@ -36,11 +36,11 @@ def player_dead(player):
 
 def player_win(player):
     util.clear_screen()
-    engine.story("end_story.txt")
-    ui.display_title("You win")
+    engine.story("end_story.txt",player)
+    ui.display_title("You win".center(119),3,0)
     engine.hall_of_fame("result",player['lvl'],player['exp'], player['name'])
-    ui.display_message(f"You have achieved {player['lvl']} level.",2)
-    util.press_any_button(4)
+    ui.display_message(f"You have achieved {player['lvl']} level.".center(119),2,0)
+    util.press_any_button(3,0,True)
     return main()
 
 def quit():
@@ -109,7 +109,7 @@ def main():
                 ui.display_boss_board(boards[board_level[0]])
             else:
                 ui.display_board(boards[board_level[0]])
-            ui.display_stats(player,boards[board_level[0]],2)
+            ui.display_stats(player,2)
             player_location_row, player_location_col = player["player_location"]
 
             key = util.key_pressed()

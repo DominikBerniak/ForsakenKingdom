@@ -49,7 +49,6 @@ def display_boss_board(board):
     boss_location = engine.get_boss_location(board,BOSS_ICON)
     boss_design = [BODY_BOSS_ICON] * 6 +["Q"," ","Q"]+[BODY_BOSS_ICON] * 2+[" ",BOSS_ICON," ",]+[BODY_BOSS_ICON] * 2+["V"]*3+[BODY_BOSS_ICON] * 6
     index_of_boss_design = 0
-    print("\n")
     if boss_location[0]:
         for i in range(len(board)):
             for j in range(len(board[0])):
@@ -59,8 +58,13 @@ def display_boss_board(board):
                 else:
                     if board[i][j] == BODY_BOSS_ICON:
                         board[i][j] =" "                  
-                print(board[i][j],end="")
-            print()
+                # print(board[i][j],end="")
+            # print()
+    print("\n")
+    for i in range(len(board)):
+        row = "".join(board[i])
+        row = row.replace("O", " ")
+        print(f"{row}".center(119))
 
 def display_equipment(player):
     # display_title("Your Equipment".center(119),3,0)
@@ -70,7 +74,7 @@ def display_equipment(player):
     # for i in range(len(equipment_headers)):
     #     print(f"\n\n    {equipment_headers[i]} : {equipment[i]['name']}   {equipment[i]['type']}= {equipment[i]['value']}")
 
-def display_stats(player_stats,board,new_lines=0, divider = ", the ", cut = 7):
+def display_stats(player_stats,new_lines=0, divider = ", the ", cut = 7):
     """
     player_stats.keys() = {"name", "race", "health", "lvl", "exp", 
                         "attack", "armor", "player_location", "player_icon", "inventory"}
@@ -103,9 +107,9 @@ def display_stats(player_stats,board,new_lines=0, divider = ", the ", cut = 7):
         second_row += stats_to_display[1][i] + " | "
     new_lines = "\n" * new_lines
     print(new_lines)
-    print(f"{first_row}".center(len(board[0])+3))
+    print(f"{first_row}".center(119+3))
     print()
-    print(f"{second_row[:-2]}".center(len(board[0])+6))
+    print(f"{second_row[:-2]}".center(119+6))
 
 def display_menu(title, list_options):
     longest_option_lenght = len(max(list_options, key=len))
@@ -210,7 +214,7 @@ def display_menu_art():
         filler = (longest_row_length - row_lenght) * " "
         print(f"{art[i]}{filler}".center(119))
 
-def display_fight_art(board):
+def display_fight_art():
     art = """   |\                     /)
  /\_\\\__               (_//
 |   `>\-`     _._       //`)
@@ -231,4 +235,4 @@ def display_fight_art(board):
     for i in range(len(art)):
         row_lenght = len(art[i])
         filler = (longest_row_length - row_lenght) * " "
-        print(f"{art[i]}{filler}".center(len(board[0])-4))
+        print(f"{art[i]}{filler}".center(119))

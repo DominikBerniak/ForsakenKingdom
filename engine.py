@@ -869,7 +869,7 @@ def add_random_item_to_inventory(player, is_treasure=False):
         player["inventory"].append(random_item)
     return random_item
 
-def fight_enemy(player,board,is_boss=False):
+def fight_enemy(player,is_boss=False):
     if is_boss:
         enemy = create_boss()
     else:
@@ -879,17 +879,20 @@ def fight_enemy(player,board,is_boss=False):
     turn = random.choice([enemy_turn,player_turn])
 
     util.clear_screen()
-    ui.display_title(f'You have encountered the {enemy["adjective"]} {enemy["name"]}.'.center(119),3,0)
+    if is_boss:
+        ui.display_title(f'You have encountered {enemy["adjective"]} {enemy["name"]}.'.center(119),3,0)
+    else:
+        ui.display_title(f'You have encountered the {enemy["adjective"]} {enemy["name"]}.'.center(119),3,0)
     util.press_any_button(2,0,True)
     while True:
         util.clear_screen()
-        ui.display_stats(enemy,board,1," ",5)
-        ui.display_fight_art(board)
-        ui.display_stats(player,board,1)
+        ui.display_stats(enemy,1," ",5)
+        ui.display_fight_art()
+        ui.display_stats(player,1)
 
         #enemy turn
         if turn == enemy_turn:
-            ui.display_message(f"It's {turn.lower()}'s turn to attack".center(len(board[0])),2,0)
+            ui.display_message(f"It's {turn.lower()}'s turn to attack".center(119),2,0)
             sleep(1)
             enemy_max_damage = (enemy["attack"] - player["armor"])
             if enemy_max_damage > 0:
@@ -897,16 +900,16 @@ def fight_enemy(player,board,is_boss=False):
                 player["health"] -= enemy_damage
             else:
                 enemy_damage = 0
-            ui.display_message(f"{enemy['name']} did {enemy_damage} damage".center(len(board[0])),2,filler=0)
+            ui.display_message(f"{enemy['name']} did {enemy_damage} damage".center(119),2,filler=0)
             util.press_any_button(1,0,True)
             util.clear_screen()
             turn = player_turn
 
         #player turn
         else:
-            ui.display_message(f"It's your turn to attack".center(len(board[0])),4,0)
-            ui.display_message("Attack | Use Item\n".center(len(board[0])),2,0)
-            player_input = input("".rjust(len(board[0])//2)).lower().replace(" ", "")
+            ui.display_message(f"It's your turn to attack".center(119),4,0)
+            ui.display_message("Attack | Use Item\n".center(119),2,0)
+            player_input = input("".rjust(119//2)).lower().replace(" ", "")
             if player_input in ["useitem", "u", "i"]:
                 did_use_item = use_item(player)
                 if did_use_item:
@@ -919,7 +922,7 @@ def fight_enemy(player,board,is_boss=False):
                 else:
                     player_damage = 0
                 if enemy["health"] > 0:
-                    ui.display_message(f"You did {player_damage} damage".center(len(board[0])),2,filler=0)
+                    ui.display_message(f"You did {player_damage} damage".center(119),2,filler=0)
                     util.press_any_button(1,0,True)
                     util.clear_screen()
                     turn = enemy_turn
@@ -938,9 +941,9 @@ def fight_enemy(player,board,is_boss=False):
         dropped_item = add_random_item_to_inventory(player)
         util.clear_screen()
         if dropped_item["name"] != "Gold":
-            ui.display_message(f"You have killed the {enemy['adjective']} {enemy['name']}, have gained {enemy['exp']} exp and have picked up {dropped_item['name']}".center(len(board[0])),4,0)
+            ui.display_message(f"You have killed the {enemy['adjective']} {enemy['name']}, have gained {enemy['exp']} exp and have picked up {dropped_item['name']}".center(119),4,0)
         else:
-            ui.display_message(f"You have killed the {enemy['adjective']} {enemy['name']}, have gained {enemy['exp']} exp and have picked up {dropped_item['value']} {dropped_item['name']}".center(len(board[0])),4,0)
+            ui.display_message(f"You have killed the {enemy['adjective']} {enemy['name']}, have gained {enemy['exp']} exp and have picked up {dropped_item['value']} {dropped_item['name']}".center(119),4,0)
         util.press_any_button(1,0,True)
         return "victory"
     else:
@@ -983,13 +986,13 @@ def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_i
         interaction_with_traders(player,board_level)
         return [0]
     elif board[player_row][player_col] == enemy_icon:
-        result = fight_enemy(player,board)
+        result = fight_enemy(player)
         if result == "victory":
             return [1]
         elif result == "defeat":
             return [0,"defeat"]
     elif board[player_row][player_col] == boss_icon:
-        result = fight_enemy(player,board,True)
+        result = fight_enemy(player,True)
         if result == "victory":
             return [0,"final_victory"]
         elif result == "defeat":
@@ -1033,9 +1036,9 @@ def move_enemies_randomly(board,enemy_icon,player,is_boss = False):
         if is_next_to_player(enemy_current_row,enemy_current_col,player):
             board[enemy_current_row][enemy_current_col] = " "
             if is_boss:
-                return fight_enemy(player,board,True)
+                return fight_enemy(player,True)
             else:
-                return fight_enemy(player,board)
+                return fight_enemy(player)
         
         random_row_move = random.choice([-1,0,0,0,0,0,1])
         if random_row_move in [-1,1]:
