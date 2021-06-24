@@ -2,6 +2,7 @@ import random
 import util
 import ui
 from time import sleep
+from importlib import reload
 
 def create_board(width, height):
     board = [[" " for x in range(width)]for y in range(height)]
@@ -15,13 +16,29 @@ def create_board(width, height):
     return board
 
 def create_player(player_start_row, player_start_col, player_icon):
+    nothing_armor_item = {
+        "name":"Nothing",
+        "type":"Armor",
+        "value":0
+    }
+    nothing_weapon_item = {
+        "name":"Nothing",
+        "type":"Attack",
+        "value":0
+    }
+    start_gold ={
+        "name":"Gold",
+        "type":"Gold",
+        "value":0
+    }
+    equipment = [nothing_armor_item,nothing_armor_item,nothing_armor_item,nothing_armor_item,nothing_weapon_item]
     while True:
         ui.clear_screen()
-        ui.display_title("Create your hero")
-        player_stats = {"name":util.get_input("Your hero's name",1).title()}
+        ui.display_title("Create your hero!".center(119),2,0)
+        player_stats = {"name":util.get_input("Your hero's name",2,center=True).title()}
         if player_stats["name"] == "Admin":
-            player_stats.update({"race":"God" ,"health":1000000,"lvl":1000000,"exp":1000000,"attack":1000000,
-                                "armor":1000000,"player_location": [player_start_row,player_start_col],"player_icon":player_icon, "inventory":[]})
+            player_stats.update({"race":"God" ,"health":1000000,"lvl":1000000,"exp":0,"attack":1000000,
+                                "armor":1000000,"player_location": [player_start_row,player_start_col],"player_icon":player_icon, "inventory":[start_gold],"equipment": equipment})
             return player_stats
         while True:        
             orc = {"race":"Orc" ,"health":125,"lvl":1,"exp":0,"attack":7,"armor":20}
@@ -48,7 +65,7 @@ def create_player(player_start_row, player_start_col, player_icon):
                 ui.display_error_message("    Wrong race name!")
                 sleep(2)      
         player_stats.update({"player_location": [player_start_row,player_start_col],
-                                "player_icon":player_icon, "inventory": []})
+                                "player_icon":player_icon, "inventory": [start_gold],"equipment": equipment})
         ui.clear_screen()
         if util.get_confirmation(f"""You've created {player_stats["name"]}, the {player_stats["race"]}.
     
@@ -56,12 +73,65 @@ def create_player(player_start_row, player_start_col, player_icon):
             break
     return player_stats
 
-def is_unoccupied(board,row,col):
-    return board[row][col] == " " or board[row][col] == "O" or board[row][col] == "T"
+def save_game(player, boards, board_level):
+    with open("saved_games.py","w") as save_file:
+        save_file.write(f"player = {player}\nboards = {boards}\nboard_level = {board_level[0]}")
 
-def is_not_wall(board, row, col,door_icon):
-    return (board[row][col] != "=" and board[row][col] != "|" 
-            and board[row][col] != door_icon)
+def load_game(player, boards, board_level):
+    try:
+        import saved_games
+        reload(saved_games)
+        player.update(saved_games.player)
+        boards[:] = saved_games.boards
+        board_level[0] = saved_games.board_level
+    except:
+        util.clear_screen()
+        ui.display_error_message("There are no saved games".center(119),3,0)
+        util.press_any_button(2,0,True)
+        util.clear_screen()
+
+def create_pause_menu():
+    options = ["Exit Game",
+               "Resume Game",
+               "Save Game",
+               "Load Game",
+               "Main Menu"]
+    ui.display_menu("Game paused", options)
+
+def pause_menu(player, boards, board_level):
+    while True:
+        create_pause_menu()
+        try:
+            option = int(util.get_input("Select option".rjust(130//2),1,0))
+            if option == 0:
+                return "exit_game"
+            elif option == 1:
+                return
+            elif option == 4:
+                return "back_to_menu"
+            elif option == 2:
+                return save_game(player, boards, board_level)
+            elif option == 3:
+                return load_game(player, boards, board_level)
+            else:
+                raise KeyError
+        except KeyError:
+            util.clear_screen()
+            ui.display_error_message("There is no such option!".center(119),3,0)
+            util.press_any_button(2,0,True)
+            util.clear_screen()
+            
+        except ValueError:
+            util.clear_screen()
+            ui.display_error_message("Please enter a number!\n".center(119),3,0)
+            util.press_any_button(2,0,True)
+            util.clear_screen()
+
+def is_unoccupied(board,row,col):
+    return board[row][col] == " " or board[row][col] == "O"
+
+def is_not_wall(board, row, col):
+    return (board[row][col] != "=" and board[row][col] != "|")
 
 def get_player_placement(board, player_icon):
     for i in range(len(board)):
@@ -70,9 +140,11 @@ def get_player_placement(board, player_icon):
                 return i,j
 
 def put_player_on_board(board, player,player_icon):
+    ########zakomentować, żeby rysować######
     cords = get_player_placement(board, player_icon)
     if cords:
         board[cords[0]][cords[1]] = " "
+    #######################################
     player_row, player_col, player_icon = player["player_location"][0],player["player_location"][1], player["player_icon"]
     board[player_row][player_col] = player_icon
 
@@ -106,10 +178,53 @@ def put_door_on_board(board,door_icon):
         else:
             enter_door_col = random.choice([0, len(board[i][0])-1])
         if i < len(board)-1:
-            board[i][enter_door_row][enter_door_col] = " " #door_icon
+            board[i][enter_door_row][enter_door_col] = door_icon
         exit_door_row, exit_door_col = get_next_level_old_door_location(board[0], enter_door_row, enter_door_col)
         if i < len(board)-1:
             board[i+1][exit_door_row][exit_door_col] = "O" #open door
+
+def find_the_door(board):
+    for row in range(len(board)):
+        for col in range(len(board[0])):
+            if board[row][col] == "X":
+                return row,col
+
+def delete_key_from_inventory(inventory):
+    for index in range(len(inventory)):
+        if inventory[index]["name"] == "Key":
+            del inventory[index]
+
+def open_the_door(board,player):
+    enter_door_row,enter_door_col = find_the_door(board)
+    if have_key_in_inventory(player["inventory"]) != False:
+        util.clear_screen()
+        board[enter_door_row][enter_door_col] =" "
+        delete_key_from_inventory(player["inventory"])
+    else:
+        ui.display_message("Not have a key!!! Go find it!!")
+        util.press_any_button()
+        
+def is_next_to_player(enemy_row,enemy_col,player):
+    player_row, player_col = player["player_location"]
+    if enemy_row + 1 == player_row and enemy_col == player_col:
+        return True
+    elif enemy_row - 1 == player_row and enemy_col == player_col:
+        return True
+    elif enemy_row == player_row and enemy_col + 1 == player_col:
+        return True
+    elif enemy_row == player_row and enemy_col - 1 == player_col:
+        return True
+    return False
+
+
+def put_npc_quest_on_board(board,npc_quest_icon):
+    for i in range(len(board)):
+        npc_row = random.randint(1, len(board[i])-2)
+        npc_col = random.randint(1, len(board[i][0])-2)
+        while not is_unoccupied(board[i],npc_row,npc_col):
+            npc_row = random.randint(1, len(board[i])-2)
+            npc_col = random.randint(1, len(board[i][0])-2)
+        board[i][npc_row][npc_col] = npc_quest_icon
 
 def put_npc_shop_on_board(board,npc_shop_icon):
     for i in range(len(board)):
@@ -131,60 +246,16 @@ def put_item_on_board(board,item_icon):
                 x-=1
             board[i][item_row][item_col] = item_icon
 
-
-
-# def put_enemy_on_board(board,item_icon_board):
-#     for i in range(len(board)):
-#         npc_row = random.randint(1, len(board[i])-2)
-#         npc_col = random.randint(1, len(board[i][0])-2)
-#         while not is_unoccupied(board[i],npc_row,npc_col):
-#             npc_row = random.randint(1, len(board[i])-2)
-#             npc_col = random.randint(1, len(board[i][0])-2)
-#         board[i][npc_row][npc_col] = item_icon_board
-
-
-# def put_enemy_on_board(board,item_icon_board):
-#     x=10
-#     while x>=0:
-#         if not is_unoccupied (board[i],item_row,item_col):
-#             item_row = random.randint(1, len(board[i])-2)
-#             item_col = random.randint(1, len(board[i][0])-2)
-
-
-#     for i in range(len(board)):
-#         npc_row = random.randint(1, len(board[i])-2)
-#         npc_col = random.randint(1, len(board[i][0])-2)
-#         while not is_unoccupied(board[i],npc_row,npc_col):
-#             npc_row = random.randint(1, len(board[i])-2)
-#             npc_col = random.randint(1, len(board[i][0])-2)
-#         board[i][npc_row][npc_col] = item_icon_board
-
-
-
-
-
-
-    # for i in range(len(board)):
-    #     number_of_enemies = random.randint(10,15)
-    #     while number_of_enemies > 0:
-    #         item_row = random.randint(1, len(board[i])-2)
-    #         item_col = random.randint(1, len(board[i][0])-2)
-    #         while not is_unoccupied(board[i],item_row,item_col):
-    #             item_row = random.randint(1, len(board[i])-2)
-    #             item_col = random.randint(1, len(board[i][0])-2)
-    #         board[i][item_row][item_col] = enemy_icon
-    #         number_of_enemies -= 1
-
 def put_enemy_on_board(board,enemy_icon):
     for i in range(len(board)):
         number_of_enemies = random.randint(10,15)
         while number_of_enemies > 0:
-            npc_row = random.randint(1, len(board[i])-2)
-            npc_col = random.randint(1, len(board[i][0])-2)
-            while not is_unoccupied(board[i],npc_row,npc_col):
-                npc_row = random.randint(1, len(board[i])-2)
-                npc_col = random.randint(1, len(board[i][0])-2)
-            board[i][npc_row][npc_col] = enemy_icon
+            enemy_row = random.randint(1, len(board[i])-2)
+            enemy_col = random.randint(1, len(board[i][0])-2)
+            while not is_unoccupied(board[i],enemy_row,enemy_col):
+                enemy_row = random.randint(1, len(board[i])-2)
+                enemy_col = random.randint(1, len(board[i][0])-2)
+            board[i][enemy_row][enemy_col] = enemy_icon
             number_of_enemies -= 1
 
 def random_item_name(type,type_description):
@@ -210,7 +281,7 @@ def create_item(is_shop=False):
     consumable = ["Ham","Cheese","Elixir","Bread","Water"]
     consumable_description = ["Stinky","Tasty","Godlike"]
     if not is_shop:
-        type = ["Weapons","Weapons","Weapons","Armor","Armor","Health","Gold"]
+        type = ["Weapons","Weapons","Armor","Armor","Health","Gold","Gold","Gold"]
     else:
         type = ["Weapons","Weapons","Weapons","Armor","Armor","Health","Health"]
 
@@ -233,42 +304,48 @@ def create_item(is_shop=False):
 
 def authors():
     crew = ["Dawid Kuropka     : Full-Stack Developer",
-            "Kewin Gregorczyk  : Full-Stack Developer",
-            "Kordian Płusa     : Full-Stack Developer",
-            "Jakub Młocek      : Full-Stack Developer",
-            "Dominik Berniak   : Full-Stack Developer"]
-    crew_display = ""
-    i = 0
+        "Kewin Gregorczyk  : Full-Stack Developer",
+        "Kordian Płusa     : Full-Stack Developer",
+        "Jakub Młocek      : Full-Stack Developer",
+        "Dominik Berniak   : Full-Stack Developer"]
     x = 0
+    i = 0
     while x in range(len(crew)*2):
         ui.clear_screen()
-        ui.display_title("            Game authors:\n")
+        ui.display_title("Game authors:".center(119),3,0)
         if x == 0:
-            crew_display = crew[i]
+            crew_display = crew[i].center(119)
         elif x%2 != 0:
-            crew_display = "\n    " + crew_display
+            crew_display = "\n" + crew_display
             i+=1
         else:
-            crew_display = crew[i] + "\n    " + crew_display
-        ui.display_message(crew_display,1)
+            crew_display = crew[i].center(119) + "\n" + crew_display
+        ui.display_message(f"{crew_display}".center(119),2,filler=0)
         sleep(0.2)
         x+=1
-    util.press_any_button(3,8)
+    util.press_any_button(3,0,True)
     util.clear_screen()
 
 def instruction():
     ui.clear_screen()
-    information = """Preparation for the game:",
-                "First you need to create a character. Choose the races responsibly! 
-                "Each race has different stats. The character is moved by W/S/A/D. Also \"W\" is
-                "to attacking. 
-                "Objective:
-                "The most important objective is defeating the final boss,
-                "but before you get to this stage, you have to defeat a lot of enemies.
-                "During your adventure you will meet \"npc\" with whom you can trade,
-                "and they can give you a quests."""
-    ui.display_message(information,2)
-    util.press_any_button(2)
+    information = """Preparation for the game:
+First you need to create a character. Choose the races responsibly!
+Each race has different stats. The character is moved by W/S/A/D.
+Objective:
+The main goal is to defeat the final boss,
+but before you get to this stage, you have to kill a lot of enemies.
+During your adventure you will meet shop npcs marked with "$" with whom you can trade.
+You will also meet quest npcs marked with "?" who will give you tasks to do."""
+    
+    information = information.split("\n")
+    longest_row_lenght = len(max(information,key=len))
+    for i in range(len(information)):
+        filler = (longest_row_lenght-len(information[i]))*" "
+        if i != 0 and i !=3:
+            ui.display_message(f"{information[i]}{filler}".center(119),1,0)
+        else:
+            ui.display_message(f"{information[i]}{filler}".center(119),4,0)
+    util.press_any_button(4,0,True)
     util.clear_screen()
 
 def hall_of_fame(player_level, mode, current_exp, player_name):
@@ -298,6 +375,7 @@ def hall_of_fame(player_level, mode, current_exp, player_name):
 def create_menu():
     options = ["Exit game", 
                "New Game",
+               "Load Game",
                "Hall of Fame",
                "Authors",
                "Instruction"]
@@ -305,13 +383,14 @@ def create_menu():
 
 def load_module(option):
     if option == 1:
-        #start_game()
         return "start_game"
     elif option == 2:
-        hall_of_fame(0,"scoreboard", 0, "none")
+        return "load_game"
     elif option == 3:
-        authors()
+        hall_of_fame(0,"scoreboard", 0, "none")
     elif option == 4:
+        authors()
+    elif option == 5:
         instruction()
     elif option == 0:
         return "quit"
@@ -322,28 +401,27 @@ def menu():
     while True:
         create_menu()
         try:
-            option = util.get_input("Select option",2)
-            # load_module(int(option))
+            option = util.get_input("Select option".rjust(130//2),1,0)
             option = load_module(int(option))
-            if option == "start_game" or option == "quit":
+            if option == "start_game" or option == "quit" or option == "load_game":
                 return option
 
         except KeyError:
             util.clear_screen()
-            ui.display_error_message("There is no such option!\n")
-            util.press_any_button(1)
+            ui.display_error_message("There is no such option!".center(119),3,0)
+            util.press_any_button(2,0,True)
             util.clear_screen()
             
         except ValueError:
             util.clear_screen()
-            ui.display_error_message("Please enter a number!\n")
-            util.press_any_button(1)
+            ui.display_error_message("Please enter a number!".center(119),3,0)
+            util.press_any_button(2,0,True)
             util.clear_screen()
 
 def create_npc(name,cost_item,amount_items_in_shop):
     list_items_in_shop = []
     for i in range(amount_items_in_shop):
-        list_items_in_shop.append(create_item())
+        list_items_in_shop.append(create_item(True))
     npc = {
         "icon": "$",
         "name": name,
@@ -375,7 +453,8 @@ def create_peter():
         "quest_description":"You must correct answer to my question",
         "quest":"What is the name of command to add one or more files to the staging area?",
         "answer": "git add",
-        "reward": create_torch()
+        "reward": create_torch(),
+        "is_done": False
     }
     return peter
 
@@ -386,7 +465,8 @@ def create_kate():
         "quest_description": "You must correct answer to my question",
         "quest": "How reversed string where variable name word?",
         "answer":"word[::-1]",
-        "reward":create_key()
+        "reward":create_key(),
+        "is_done": False
     }
     return kate
 
@@ -397,26 +477,42 @@ def create_adalbert():
         "quest_description": "You must correct answer to my question",
         "quest": "What is a StackOverflow? ",
         "answer":"error",
-        "reward":create_key()
+        "reward":create_key(),
+        "is_done": False
     }
     return adalbert
 
-def do_quest(npc,board,player):
-    util.clear_screen()
-    ui.display_message(npc["name"] + ": "+npc["quest_description"])
-    ui.display_message("You: ")
-    answer = input(npc["quest"])
-    if answer == npc["answer"]:
-        ui.display_message(npc["name"]+": "+"Correct, you got a key!!")
+def have_key_in_inventory(inventory):
+    index =0
+    for item in inventory:
+        if item["type"] == "Key":
+            return index
+        index += 1
+    return False
+
+def do_quest(player,board_lvl):
+    if board_lvl == 0:
+        npc = create_kate()
+    elif board_lvl == 1:
+        npc = create_peter()
     else:
-        ui.display_message(npc["name"]+": "+"uuh, sry you must still learn this")
+        npc = create_adalbert()
+    if not have_key_in_inventory(player["inventory"]) or npc["is_done"]:
+        util.clear_screen()
+        ui.display_message(npc["name"] + ": "+npc["quest_description"])
+        answer = util.get_input(npc["name"]+": "+npc["quest"])
+        reward = npc["reward"]
+
+        if answer == npc["answer"]:
+            ui.display_message(npc["name"]+": "+"Correct, you got a key!!")
+            add_to_inventory(player,reward)
+        else:
+            ui.display_message(npc["name"]+": "+"uuh, sry you must still learn this")
+    else:
+        util.clear_screen()
+        ui.display_message(npc["name"]+": "+"You have the key already!")
     
     util.press_any_button()
-    reward = npc["reward"]
-
-    add_to_inventory(player,reward)
-    util.clear_screen()
-    ui.display_board(board)
 
 def add_to_inventory(player, added_items):
     inventory = player["inventory"]
@@ -435,19 +531,39 @@ def update_gold_in_inventory(inventory,amount_of_gold):
                 raise ValueError
             else:
                 inventory[index]["value"] += amount_of_gold
-                
+
+def create_boss():
+    boss = {
+        "adjective":"Godness",
+        "name":"Yoshi, the Dog",
+        "health":[200],
+        "attack":35,
+        "armor":20,
+        "icon":"B"
+    }
+    return boss
+
 def create_enemy(player):
-    #format MARKER, ATK, MIN HP, MAX HP, ARMOR, EXP
+    skeleton = {"adjective": "","name":"Skeleton","health":[5,50],"attack": 10,"armor":5, "exp": 10}
+    ghoul = {"adjective": "","name":"Ghoul","health":[15,50],"attack": 20,"armor":0, "exp": 15}
+    boar = {"adjective": "","name":"Boar","health":[50,200],"attack": 10,"armor":2, "exp": 25}
+    spider = {"adjective": "","name":"Spider","health":[10,50],"attack": 15,"armor":0, "exp": 15}
+    ghost = {"adjective": "","name":"Ghost","health":[1,5],"attack": 7,"armor":0, "exp": 5}
+    ogre = {"adjective": "","name":"Ogre","health":[20,75],"attack": 25,"armor":10, "exp": 75}
+    enemy = random.choice([skeleton, ghoul, boar, spider, ghost, ogre])
+
+    enemy_adjectives = ["Mighty", "Fearless", "Powerful", "Deadly", "Ferocious", "Horrifying", "Frightening", "Spooky", "Ghostly"]
+    enemy_adjective = random.choice(enemy_adjectives)
+    if enemy["name"] == "Skeleton":
+        enemy_adjective = random.choice([enemy_adjective, "Scary Spooky"])
+    enemy["adjective"] = enemy_adjective
+    
     player_level = player["lvl"]
-    enemies = {"Skeleton":["╥",10,5,50,75, 10], "Ghoul":["╓",20,15,50,5,15], "Boar":["╖", 10, 50, 200,40,25],
-                 "Spider":["╫", 15,10,50,20,15],"Ghost":["░",3,1,5,100,5], "Ogre":["V",25,20,75,100,75]}
-    random_enemy = random.choice(list(enemies.items()))
-    marker,atack, min_hp, max_hp, armor, exp = random_enemy[1]
     if player_level < 5: 
-        max_hp = max_hp//2
-        armor = armor//2
-    health = random.randint(min_hp, max_hp)
-    enemy = {"name": random_enemy[0],"enemy_icon":marker,"attack":atack,"health": health,"armor": armor,"exp":exp}
+        enemy["health"][1] = enemy["health"][1]//2
+        enemy["armor"] = enemy["armor"]//2
+    enemy["health"] = random.randint(enemy["health"][0],enemy["health"][1])
+
     return enemy
 
 def sell_from_inventory(player):
@@ -456,6 +572,8 @@ def sell_from_inventory(player):
         ui.display_inventory(player["inventory"])
         name_item_to_sell = util.get_input("What you want sell").lower()
         index = 0
+        if name_item_to_sell == "return":
+            break
         if name_item_to_sell in unsold_items:
             continue
         for item in player["inventory"]:
@@ -466,7 +584,13 @@ def sell_from_inventory(player):
             del player["inventory"][index]
             update_gold_in_inventory(player["inventory"],10)
             util.clear_screen()
-            ui.display_inventory(player["inventory"])
+            if len(player["inventory"])>0:
+                ui.display_inventory(player["inventory"])
+            else:
+                util.clear_screen()
+                ui.display_message("Your inventory is empty.".center(119),3,0)
+            util.press_any_button(4,0,True)
+
         except IndexError:
             ui.display_error_message(f"You don't have {name_item_to_sell.title()}")
         
@@ -481,31 +605,102 @@ def buy_from_shop(player,npc):
         ui.display_inventory(shop)
         index = 0
         name_item_to_buy = util.get_input("Want you buy something?").lower()
+        if name_item_to_buy == "return":
+            break
         for item in shop:
-                if name_item_to_buy == item["name"].lower():
-                    break
-                index += 1
+            if name_item_to_buy == item["name"].lower():
+                break
+            index += 1
         try:
+            update_gold_in_inventory(player["inventory"],-(npc["cost_item"]))
             add_to_inventory(player,shop[index])
             del shop[index]
-            gold = {
-                "type" : "Gold",
-                "name" : "Gold",
-                "value": -(npc["cost_item"])
-                }
-            update_gold_in_inventory(player["inventory"],-(npc["cost_item"]))
             util.clear_screen()
-            ui.display_inventory(player["inventory"])
+            if len(player["inventory"])>0:
+                    ui.display_inventory(player["inventory"])
+            else:
+                util.clear_screen()
+                ui.display_message("Your inventory is empty.".center(119),3,0)
+            util.press_any_button(4,0,True)
+
         except IndexError:
             ui.display_error_message(f"I don't have {name_item_to_buy.title()}")
+            util.press_any_button(4,0,True)
         except ValueError:
             ui.display_error_message(f"You don't have money to buy this")
+            util.press_any_button(4,0,True)
 
-        if util.get_confirmation("Wanna buy somthing else?"):
+        if util.get_confirmation("Wanna buy something else?"):
             util.clear_screen()
         else:
             break
 
+def filter_items(inventory,type,part_of_armor=""):
+    filtred_inventory = []
+    if type == "Armor":
+        for item in inventory:
+            item_name = item["name"].split(" ")
+            if part_of_armor in item_name:
+                filtred_inventory.append(item)
+    elif type == "Weapons":
+        for item in inventory:
+            if item["type"] == type:
+                filtred_inventory.append(item)
+    return filtred_inventory
+
+def choose_item_to_wear(filtred_inventory,player,number_of_part_equipment):
+    while True:
+        util.clear_screen()
+        if len(filtred_inventory)>0:
+            ui.display_inventory(player["inventory"])
+            item_from_inventory = util.get_input("Choose item to wear").lower()
+            for item in filtred_inventory:
+                if item["name"].lower() == item_from_inventory:
+                    return item
+            if item_from_inventory == "return":
+                return player["equipment"][number_of_part_equipment]
+            ui.display_error_message(f"You not have {item_from_inventory.title()} in item")
+        else:
+            util.clear_screen()
+            ui.display_message("Your inventory is empty.".center(119),3,0)
+            util.press_any_button(4,0,True)
+            return player["equipment"][number_of_part_equipment]
+        
+
+def wear_equipment(player):
+    while True:
+        util.clear_screen()
+        ui.display_equipment(player)
+        equipment = player["equipment"]
+        part_of_equipment = util.get_input("Choose your part of equipment").title()
+        if part_of_equipment == "Head":
+            filtred_item = filter_items(player["inventory"],"Armor","Helmet")
+            player["armor"] -= equipment[0]["value"]
+            equipment[0] = choose_item_to_wear(filtred_item,player,0)
+            player["armor"] += equipment[0]["value"]
+        elif part_of_equipment == "Chest":
+            filtred_item = filter_items(player["inventory"],"Armor","Chest")
+            player["armor"] -= equipment[1]["value"]
+            equipment[1] = choose_item_to_wear(filtred_item,player,1)
+            player["armor"] += equipment[1]["value"]
+        elif part_of_equipment == "Legs":
+            filtred_item = filter_items(player["inventory"],"Armor","Trousers")
+            player["armor"] -= equipment[2]["value"]
+            equipment[2] = choose_item_to_wear(filtred_item,player,2)
+            player["armor"] += equipment[2]["value"]
+        elif part_of_equipment == "Shoes":
+            filtred_item = filter_items(player["inventory"],"Armor","Shoes")
+            player["armor"] -= equipment[3]["value"]
+            equipment[3] = choose_item_to_wear(filtred_item,player,3)
+            player["armor"] += equipment[3]["value"]
+        elif part_of_equipment == "Weapons":
+            filtred_item = filter_items(player["inventory"],"Weapons")
+            player["attack"] -= equipment[4]["value"]
+            equipment[4] = choose_item_to_wear(filtred_item,player,4)
+            player["attack"] += equipment[4]["value"]
+        else:
+            break
+    
 def use_item(player):
     inventory = list(player["inventory"])
     inventory_to_display = [inventory[i] for i in range(len(inventory)) if inventory[i]["type"] == "Health"]
@@ -514,7 +709,9 @@ def use_item(player):
             util.clear_screen()
             ui.display_inventory(inventory_to_display,"Consumables:\n")
             was_item_used = False
-            player_input = util.get_input("What do you want to use?\n\n    (name of item / return)",4).title()
+            ui.display_message("What do you want to use?".center(119),4,filler=0)
+            ui.display_message("(name of item / return)\n".center(120),1,filler=0)
+            player_input = input("".rjust(119//2)).title()
             if player_input == "Return":
                 return False
             for i in range(len(inventory)):
@@ -526,57 +723,179 @@ def use_item(player):
             if was_item_used:
                 return was_item_used
             else:
-                ui.display_error_message("No such item in your inventory", 4)
-                util.press_any_button(1)
+                ui.display_error_message("No such item in your inventory".center(119), 4,0)
+                util.press_any_button(2,center=True)
     else:
         util.clear_screen()
-        ui.display_error_message("There are no consumables in your inventory",4)
-        util.press_any_button(1)
+        ui.display_error_message("There are no consumables in your inventory".center(119),4,0)
+        util.press_any_button(2,center=True)
         return False
 
+def add_random_item_to_inventory(player):
+    random_item = create_item()
+    if random_item["type"] == "Gold":
+        added_gold = False
+        for i in range(len(player["inventory"])):
+            if player["inventory"][i]["type"] == "Gold":
+                player["inventory"][i]["value"] += random_item["value"]
+                added_gold = True
+        if not added_gold:
+            player["inventory"].append(random_item)
+    else:
+        player["inventory"].append(random_item)
+    return random_item
 
 def fight_enemy(player,board):
     enemy = create_enemy(player)
-    enemy_adjectives = ["Mighty", "Fearless", "Powerful", "Deadly", "Ferocious", "Horrifying", "Frightening", "Spooky", "Ghostly"]
-    enemy_adjective = random.choice(enemy_adjectives)
-    if enemy["name"] == "Skeleton":
-        enemy_adjective = random.choice([enemy_adjective, "Scary Spooky"])
     enemy_turn = "Enemy"
     player_turn = "Player"
     turn = random.choice([enemy_turn,player_turn])
 
-    while enemy["health"]>0 or player["health"]>0:
+    util.clear_screen()
+    ui.display_title(f'You have encountered the {enemy["adjective"]} {enemy["name"]}.'.center(119),3,0)
+    util.press_any_button(2,0,True)
+    while True:
         util.clear_screen()
-        ui.display_stats(player,board)
-        ui.display_title(f'You have encountered the {enemy_adjective} {enemy["name"]}.')
-        if turn == "Enemy":
-            ui.display_message(f"It's {turn}'s turn to attack",1)
+        ui.display_stats(enemy,board,1," ",5)
+        ui.display_fight_art(board)
+        ui.display_stats(player,board,1)
+
+        #enemy turn
+        if turn == enemy_turn:
+            ui.display_message(f"It's {turn.lower()}'s turn to attack".center(len(board[0])),2,0)
+            sleep(1.5)
+            enemy_max_damage = (enemy["attack"] - player["armor"])
+            if enemy_max_damage > 0:
+                enemy_damage = random.randint(1,enemy_max_damage)
+                player["health"] -= enemy_damage
+            else:
+                enemy_damage = 0
+            ui.display_message(f"{enemy['name']} did {enemy_damage} damage".center(len(board[0])),2,filler=0)
+            util.press_any_button(1,0,True)
+            util.clear_screen()
+            turn = player_turn
+
+        #player turn
         else:
-            ui.display_message(f"It's your turn to attack",1)
-        if turn == "Player":
-            ui.display_message("Attack  | Use Item",2)
-            player_input = input("    ").lower().replace(" ", "")
+            ui.display_message(f"It's your turn to attack".center(len(board[0])),4,0)
+            ui.display_message("Attack | Use Item\n".center(len(board[0])),2,0)
+            player_input = input("".rjust(len(board[0])//2)).lower().replace(" ", "")
             if player_input in ["useitem", "u", "i"]:
                 did_use_item = use_item(player)
                 if did_use_item:
-                    turn = "Enemy"            
+                    turn = enemy_turn
             else:
-                turn = "Enemy"
-                return
+                player_max_damage = (player["attack"] - enemy["armor"])
+                if player_max_damage > 0:
+                    player_damage = random.randint(1,player_max_damage)
+                    enemy["health"] -= player_damage
+                else:
+                    player_damage = 0
+                if enemy["health"] > 0:
+                    ui.display_message(f"You did {player_damage} damage".center(len(board[0])),2,filler=0)
+                    util.press_any_button(1,0,True)
+                    util.clear_screen()
+                    turn = enemy_turn
+
+        if enemy["health"]<=0 or player["health"]<=0:
+            break
+
+    if enemy["health"] <= 0:
+        player["exp"] += enemy["exp"]
+        if player["exp"] >= 100:
+            while True:
+                player["lvl"] += 1
+                player["exp"] -= 100
+                if player["exp"] < 100:
+                    break
+        dropped_item = add_random_item_to_inventory(player)
+        util.clear_screen()
+        if dropped_item["name"] != "Gold":
+            ui.display_message(f"You have killed the {enemy['adjective']} {enemy['name']}, have gained {enemy['exp']} exp and have picked up {dropped_item['name']}".center(len(board[0])),4,0)
         else:
-            turn = "Player"
+            ui.display_message(f"You have killed the {enemy['adjective']} {enemy['name']}, have gained {enemy['exp']} exp and have picked up {dropped_item['value']} {dropped_item['name']}".center(len(board[0])),4,0)
+        util.press_any_button(1,0,True)
+        return "victory"
+    else:
+        return "defeat"
 
+def interaction_with_traders(player,board_level):
+    shop_level_1 = create_npc("Dominic Passivniac",10,8) # panowie sory musiałem XD
+    shop_level_2 = create_npc("Kevin Gregorish",10,8)
+    shop_level_3 = create_npc("David Chickoe",10,8)
+    npcs = [shop_level_1,shop_level_2,shop_level_3]
+    while True:
+        ui.clear_screen()
+        sell_or_buy = util.get_input(f"{npcs[board_level]['name']}: Do you want to buy or sell something?".center(119),2,0).lower()
+        if sell_or_buy == "sell":
+            sell_from_inventory(player)
+        elif sell_or_buy == "buy":
+            buy_from_shop(player,npcs[board_level])
+        else:
+            util.clear_screen()
+            ui.display_error_message(f"{npcs[board_level]['name']}: I don't understand. See you later!".center(119),filler=0)
+            util.press_any_button(1,0,True)
+            break
 
-    input()
+def get_boss_location(board,boss_icon):
+    for row in range(len(board)):
+        for col in range(len(board[0])):
+            if board[row][col] == boss_icon:
+                return [row,col]
 
-
-def encounter(board, player,player_row, player_col,quest_icon,shop_icon,enemy_icon):
+def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_icon,item_icon,board_level,door_icon):
     if board[player_row][player_col] == quest_icon:
-        # quest()
-        return 0
+        do_quest(player,board_level)
+        return [0]
     elif board[player_row][player_col] == shop_icon:
-        # open_shop()
-        return 0
+        interaction_with_traders(player,board_level)
+        return [0]
     elif board[player_row][player_col] == enemy_icon:
-        fight_enemy(player,board)
-        return 1
+        result = fight_enemy(player,board)
+        if result == "victory":
+            return [1]
+        elif result == "defeat":
+            return [0,"defeat"]
+    elif board[player_row][player_col] == door_icon:
+        open_the_door(board, player)
+        return [0]
+    elif board[player_row][player_col] == item_icon:
+        item = add_random_item_to_inventory(player)
+        util.clear_screen()
+        if item["name"] != "Gold":
+            ui.display_message(f"You have picked up {item['name']}.".center(119),3,0)
+        else:
+            ui.display_message(f"You have picked up {item['value']} {item['name'].lower()}.".center(119),3,0)
+        util.press_any_button(1,0,True)
+        util.clear_screen()
+        return [1]
+
+def move_enemies_randomly(board,enemy_icon,player):
+    enemy_cords = []
+    for x in range(len(board)):
+        for y in range(len(board[0])):
+            if board[x][y] == enemy_icon:
+                enemy_cords.append([x,y])        
+
+    i = 0
+    while i < len(enemy_cords):
+        enemy_current_row = enemy_cords[i][0]
+        enemy_current_col = enemy_cords[i][1]
+        if is_next_to_player(enemy_current_row,enemy_current_col,player):
+            board[enemy_current_row][enemy_current_col] = " "
+            return fight_enemy(player,board)
+        
+        random_row_move = random.choice([-1,0,0,0,0,0,1])
+        if random_row_move in [-1,1]:
+            random_col_move = 0
+        else:
+            random_col_move = random.choice([-1,0,0,0,0,0,1])
+        if is_unoccupied(board,enemy_current_row+random_row_move,enemy_current_col+random_col_move):
+            board[enemy_current_row][enemy_current_col] = " "
+            board[enemy_current_row+random_row_move][enemy_current_col+random_col_move] = enemy_icon
+            i+=1
+        else:
+            i+=1
+            
+
+    
