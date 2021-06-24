@@ -34,8 +34,10 @@ def create_player(player_start_row, player_start_col, player_icon):
     equipment = [nothing_armor_item,nothing_armor_item,nothing_armor_item,nothing_armor_item,nothing_weapon_item]
     while True:
         ui.clear_screen()
-        ui.display_title("Create your hero!".center(119),2,0)
-        player_stats = {"name":util.get_input("Your hero's name",2,center=True).title()}
+        ui.display_title("Create your hero!\n".center(119),4,0)
+        ui.display_message("Your hero's name:".center(119),2,0)
+        print("\n")
+        player_stats = {"name":input("".rjust(119//2-3)).title()}
         if player_stats["name"] == "Admin":
             player_stats.update({"race":"God" ,"health":1000000,"lvl":1000000,"exp":0,"attack":1000000,
                                 "armor":1000000,"player_location": [player_start_row,player_start_col],"player_icon":player_icon, "inventory":[start_gold],"equipment": equipment})
@@ -47,7 +49,7 @@ def create_player(player_start_row, player_start_col, player_icon):
             elf = {"race":"Elf","health":75,"lvl":1,"exp":0,"attack":13,"armor":10}
             ui.display_race_choices([orc,human,dwarf,elf])
 
-            player_race = util.get_input(" Race",3).lower()
+            player_race = util.get_input("Race",3,0,True).lower()
             if player_race == "human":
                 player_stats.update(human)
                 break
@@ -62,49 +64,58 @@ def create_player(player_start_row, player_start_col, player_icon):
                 break
             else:
                 util.clear_screen()
-                ui.display_error_message("    Wrong race name!")
-                sleep(2)      
+                ui.display_error_message("Incorect race name.".center(119),4,0)
+                util.press_any_button(2,0,True) 
         player_stats.update({"player_location": [player_start_row,player_start_col],
                                 "player_icon":player_icon, "inventory": [start_gold],"equipment": equipment})
+
         ui.clear_screen()
-        if util.get_confirmation(f"""You've created {player_stats["name"]}, the {player_stats["race"]}.
-    
-    Do you want to play as {player_stats["name"]}? (yes/no)"""):
+        ui.display_message(f'You have created {player_stats["name"]}, the {player_stats["race"]}'.center(119),4,0)
+        ui.display_message(f"Do you want to play as {player_stats['name']}? (yes/no)".center(119),2,0)
+        if util.get_confirmation("",0):
             break
     return player_stats
 
-def save_game(player, boards, board_level):
+def save_game(player, boards, board_level,escaped_cave):
     with open("saved_games.py","w",encoding="utf-8") as save_file:
-        save_file.write(f"player = {player}\nboards = {boards}\nboard_level = {board_level[0]}")
-    # with open("boards.py","a",encoding="utf-8") as save_file:
-    #     save_file.write(f"\nlevel_3 = {boards[board_level[0]]}")
+        save_file.write(f"player = {player}\nboards = {boards}\nboard_level = {board_level[0]}\nescaped_cave = {escaped_cave}")
 
-def load_game(player, boards, board_level):
+def load_game(player, boards, board_level,escaped_cave):
     try:
         import saved_games
         reload(saved_games)
         player.update(saved_games.player)
         boards[:] = saved_games.boards
         board_level[0] = saved_games.board_level
+        escaped_cave[0] = saved_games.escaped_cave[0]
     except:
         util.clear_screen()
         ui.display_error_message("There are no saved games".center(119),3,0)
         util.press_any_button(2,0,True)
         util.clear_screen()
 
+def cheats(lumos_on):
+    util.clear_screen()
+    ui.display_message("Input your cheat code:".center(119),3,0)
+    print()
+    cheat_code = input("".rjust(119//2)).lower()
+    if cheat_code == "lumos":
+        lumos_on[0] = 1
+
 def create_pause_menu(sound_one):
     options = ["Exit Game",
                "Resume Game",
                "Save Game",
                "Load Game",
-               "Main Menu"]
+               "Main Menu",
+               "Cheats"]
     if sound_one == [1]:
         options.insert(4,"Mute Sound")
     else:
         options.insert(4,"Unmute Sound")
     ui.display_menu("Game paused", options)
 
-def pause_menu(player, boards, board_level, sound_on,unmuted):
+def pause_menu(player, boards, board_level, sound_on,unmuted,lumos_on,escaped_cave):
     while True:
         create_pause_menu(sound_on)
         try:
@@ -113,8 +124,11 @@ def pause_menu(player, boards, board_level, sound_on,unmuted):
                 return "exit_game"
             elif option == 1:
                 return
-            elif option == 5:
-                return "back_to_menu"
+            elif option == 2:
+                return save_game(player, boards, board_level,escaped_cave)
+            elif option == 3:
+                load_game(player, boards, board_level,escaped_cave)
+                return "load_game"
             elif option == 4:
                 if sound_on == [1]:
                     sound_on[0] = 0
@@ -123,10 +137,11 @@ def pause_menu(player, boards, board_level, sound_on,unmuted):
                     sound_on[0] = 1
                     unmuted[0] = 1
                 return
-            elif option == 2:
-                return save_game(player, boards, board_level)
-            elif option == 3:
-                return load_game(player, boards, board_level)
+            elif option == 5:
+                return "back_to_menu"
+            elif option == 6:
+                cheats(lumos_on)
+                return
             else:
                 raise KeyError
         except KeyError:
@@ -193,15 +208,15 @@ def put_door_on_board(boards,door_icon):
 
     for i in range(len(boards)):
         if i == 0:
-            boards[0][enter_door_row][enter_door_col] = door_icon
+            boards[0][enter_door_row][enter_door_col] = " "#door_icon
         elif i == 1:
-            boards[1][0][58] = door_icon
+            boards[1][0][58] = " " #door_icon
             exit_door_row, exit_door_col = get_next_level_old_door_location(boards[0], enter_door_row, enter_door_col)
             boards[1][exit_door_row][exit_door_col] = "O" #open door
         elif i == 2:
             enter_door_row = 0
             enter_door_col = 58
-            boards[2][enter_door_row][enter_door_col] = door_icon
+            boards[2][enter_door_row][enter_door_col] = " "#door_icon
             exit_door_row = 31
             exit_door_col = 58
             boards[2][exit_door_row][exit_door_col] = "O"
@@ -348,7 +363,7 @@ def authors():
     i = 0
     while x in range(len(crew)*2):
         ui.clear_screen()
-        ui.display_title("Game authors:".center(119),3,0)
+        ui.display_title("Game authors:".center(119),4,0)
         if x == 0:
             crew_display = crew[i].center(119)
         elif x%2 != 0:
@@ -420,7 +435,7 @@ def hall_of_fame(mode,player_level=0, current_exp = 0, player_name=""):
             HOF_scores.write(f"{player_name}|{100 * player_level + current_exp}\n")
         except:
             ui.display_message("Program encountered critical error! (error type: missing file)")
-    if mode == "scoreboard":
+    elif mode == "scoreboard":
         scoreboard = []
         try:
             HOF_scores = open(r"hall_of_fame.txt", "r")
@@ -432,10 +447,26 @@ def hall_of_fame(mode,player_level=0, current_exp = 0, player_name=""):
             scoreboard.append(line)
         sorted_score = sorted(scoreboard, key=lambda x: x[1])[:10]
         util.clear_screen()
+        print("\n")
+        longest_name_lenght = len(sorted_score[0][0])
+        longest_score_length = len(str(sorted_score[0][1]))
+        for i in range(len(sorted_score)):
+            if len(sorted_score[i][0]) > longest_name_lenght:
+                longest_name_lenght = len(sorted_score[i][0])
+
+            if len(str(sorted_score[i][1])) > longest_score_length:
+                longest_score_length = len(str(sorted_score[i][1]))
+
+        ui.display_title("Hall of Fame\n".center(119),2,0)
         for count,score in enumerate(sorted_score, start=1):
-            ui.display_message(f"{count} {score[0]} {int(score[1])}")
-        util.press_any_button()
-    util.clear_screen()
+            name_lenght = len(score[0])
+            score_length = len(str(score[1]))
+            filler_name = (longest_name_lenght-name_lenght)* " "
+            filler_score = (longest_score_length - score_length)* " "
+
+            ui.display_message(f"{count}. {score[0]}{filler_name}  : score = {int(score[1])}{filler_score}".center(119),1,0)
+        util.press_any_button(3,0,True)
+        util.clear_screen()
 
 def create_menu():
     options = ["Exit game", 
@@ -995,3 +1026,4 @@ def move_enemies_randomly(board,enemy_icon,player,is_boss = False):
             i+=1
         else:
             i+=1
+

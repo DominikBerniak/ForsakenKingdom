@@ -45,13 +45,14 @@ def player_win(player):
 
 def quit():
     ui.clear_screen()
-    ui.display_message("Thank you for playing. Goodbye!".center(119),2,0)
+    ui.display_message("Thank you for playing. Goodbye!".center(119),4,0)
     sleep(2)
     ui.clear_screen()
 
 def main():
     winsound.PlaySound("sounds/menu.wav",winsound.SND_ASYNC)
     util.clear_screen()
+    ui.display_menu_art()
     option = engine.menu()
     if option == "start_game" or option == "load_game":
         if option == "start_game":
@@ -62,20 +63,20 @@ def main():
         board_level = [0]
         sound_on = [1]
         unmuted = [0]
-        escaped_cave = False
+        lumos_on = [0]
+        escaped_cave = [False]
         engine.put_npc_shop_on_board(boards,NPC_SHOP_ICON)
         engine.put_npc_quest_on_board(boards,NPC_QUEST_ICON)
         engine.put_treasure_on_board(boards,TREASURE_ICON)
         engine.put_enemy_on_board(boards,ENEMY_ICON)
         engine.put_item_on_board(boards,ITEM_ICON)
+        engine.put_door_on_board(boards,CLOSED_DOOR_ICON)
         boss_level = engine.create_board(BOSS_BOARD_WIDTH,BOSS_BOARD_HEIGHT)
         boards.append(boss_level)
-        engine.put_door_on_board(boards,CLOSED_DOOR_ICON)
         engine.put_boss_on_board(boards[BOSS_LEVEL],BOSS_ICON)
-
         if option == "load_game":
             player = {}
-            engine.load_game(player, boards, board_level)
+            engine.load_game(player, boards, board_level, escaped_cave)
         if sound_on == [1]:
             winsound.PlaySound("sounds/first_map.wav",winsound.SND_ASYNC)
 
@@ -95,8 +96,11 @@ def main():
             
             util.clear_screen()
             engine.put_player_on_board(boards[board_level[0]], player, PLAYER_ICON)
-            if board_level[0] == 2: 
-                ui.display_board(boards[board_level[0]])
+            if board_level[0] == 2:
+                if lumos_on == [0]:
+                    ui.display_dark_board(boards[2],player)
+                else:
+                    ui.display_board(boards[board_level[0]])
             elif board_level[0] == 3:
                 ui.display_boss_board(boards[board_level[0]])
             else:
@@ -107,13 +111,23 @@ def main():
             key = util.key_pressed()
             if key == "`":
                 ui.clear_screen()
-                pause_option = engine.pause_menu(player, boards, board_level,sound_on, unmuted)
+                pause_option = engine.pause_menu(player, boards, board_level,sound_on, unmuted,lumos_on,escaped_cave)
                 if pause_option == "exit_game":
                     util.clear_screen()
                     if util.get_confirmation("Do you really want to quit the game? (yes/no)"):
                         return quit()
                 elif pause_option == "back_to_menu":
                     return main()
+                elif pause_option == "load_game":
+                    if board_level[0] == 0:
+                        winsound.PlaySound("sounds/first_map.wav",winsound.SND_ASYNC)
+                    elif board_level[0] == 1:
+                        winsound.PlaySound("sounds/second_map.wav",winsound.SND_ASYNC)
+                    elif board_level[0] == 2:
+                        winsound.PlaySound("sounds/cave.wav",winsound.SND_ASYNC)
+                    elif board_level[0] == 3:
+                        winsound.PlaySound("sounds/boss.wav",winsound.SND_ASYNC)
+
 
             elif key == "w" and engine.is_not_wall(boards[board_level[0]], player_location_row-1, player_location_col):
                 if engine.is_unoccupied(boards[board_level[0]],player_location_row-1,player_location_col):
@@ -203,16 +217,18 @@ def main():
                         board_level[0] = 1
                     else:
                         player["player_location"] = [28,3]
-                        board_level = 3
+                        board_level[0] = 3
+                        if sound_on == [1]:
+                            winsound.PlaySound("sounds/boss.wav",winsound.SND_ASYNC)
                 else:
-                    if boards[board_level[0]][player_location_row][player_location_col] == OPEN_EXIT_DOOR_ICON and not escaped_cave:
+                    if boards[board_level[0]][player_location_row][player_location_col] == OPEN_EXIT_DOOR_ICON and not escaped_cave[0]:
                         player["player_location"] = engine.player_location_after_door(boards[board_level[0]],player_location_row,player_location_col)
                         board_level[0] -= 1
                         if board_level[0] == 0 and sound_on == [1]:
                             winsound.PlaySound("sounds/first_map.wav",winsound.SND_ASYNC) 
                         if board_level[0] == 1 and sound_on == [1]:
                             winsound.PlaySound("sounds/second_map.wav",winsound.SND_ASYNC)
-                    elif board_level[0] == 1 and escaped_cave: #reentering cave
+                    elif board_level[0] == 1 and escaped_cave[0]: #reentering cave
                         player["player_location"] = [30,58]
                         board_level[0] += 1
                         if sound_on == [1]:
@@ -222,13 +238,13 @@ def main():
                             player["player_location"] = engine.player_location_after_door(boards[board_level[0]],player_location_row,player_location_col)
                         else: #entering cave
                             player["player_location"] = [15,58]
-                            if not escaped_cave:
+                            if not escaped_cave[0]:
                                 util.clear_screen()
                                 if  sound_on == [1]:
                                     winsound.PlaySound("sounds/cave.wav",winsound.SND_ASYNC)
                                 ui.display_message("You have fallen into the cave".center(119),3,0)
                                 util.press_any_button(2,0,True)
-                                escaped_cave = True
+                                escaped_cave[0] = True
                         board_level[0] += 1
     elif option == "quit":
         quit()
