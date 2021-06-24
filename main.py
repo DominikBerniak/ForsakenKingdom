@@ -21,7 +21,7 @@ PLAYER_START_COL = 58
 
 BOARD_WIDTH = 115
 BOARD_HEIGHT = 30
-BOSS_BOARD_WIDTH = 50
+BOSS_BOARD_WIDTH = 60
 BOSS_BOARD_HEIGHT = 30
 
 CAVE_LEVEL = 2
@@ -55,15 +55,17 @@ def main():
         if option == "start_game":
             util.clear_screen()
             player = engine.create_player(PLAYER_START_ROW,PLAYER_START_COL,PLAYER_ICON)
-        boards = [level_1 ,level_2,level_3,engine.create_board(BOSS_BOARD_WIDTH, BOSS_BOARD_WIDTH)]
+        boards = [level_1,level_2,level_3]
         board_level = [0]
         escaped_cave = False
-        engine.put_door_on_board(boards,CLOSED_DOOR_ICON)
         engine.put_npc_shop_on_board(boards,NPC_SHOP_ICON)
         engine.put_npc_quest_on_board(boards,NPC_QUEST_ICON)
         engine.put_treasure_on_board(boards,TREASURE_ICON)
         engine.put_enemy_on_board(boards,ENEMY_ICON)
         engine.put_item_on_board(boards,ITEM_ICON)
+        boss_level = engine.create_board(BOSS_BOARD_WIDTH,BOSS_BOARD_HEIGHT)
+        boards.append(boss_level)
+        engine.put_door_on_board(boards,CLOSED_DOOR_ICON)
         engine.put_boss_on_board(boards[BOSS_LEVEL],BOSS_ICON)
 
         if option == "load_game":
@@ -73,7 +75,7 @@ def main():
             util.clear_screen()
             engine.put_player_on_board(boards[board_level[0]], player, PLAYER_ICON)
             if board_level[0] == 2: 
-                ui.display_dark_board(boards[board_level[0]],player)
+                ui.display_board(boards[board_level[0]])
             elif board_level[0] == 3:
                 ui.display_boss_board(boards[board_level[0]])
             else:
