@@ -69,7 +69,6 @@ def main():
                 elif pause_option == "back_to_menu":
                     return main()
 
-
             elif key == "w" and engine.is_not_wall(boards[board_level[0]], player_location_row-1, player_location_col):
                 if engine.is_unoccupied(boards[board_level[0]],player_location_row-1,player_location_col):
                     player["player_location"][0] -= 1
