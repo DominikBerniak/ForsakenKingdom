@@ -701,18 +701,22 @@ def choose_item_to_wear(filtred_inventory,player,number_of_part_equipment):
     while True:
         util.clear_screen()
         if len(filtred_inventory)>0:
-            ui.display_inventory(player["inventory"])
-            item_from_inventory = util.get_input("Choose item to wear").lower()
+            ui.display_inventory(filtred_inventory)
+            ui.display_message("Choose item to wear".center(119),3,0)
+            print()
+            item_from_inventory = input("".rjust(119//2)).lower()
             for item in filtred_inventory:
                 if item["name"].lower() == item_from_inventory:
                     return item
-            if item_from_inventory == "return":
+            if item_from_inventory in ["return", ""]:
                 return player["equipment"][number_of_part_equipment]
-            ui.display_error_message(f"You not have {item_from_inventory.title()} in item")
+            util.clear_screen()
+            ui.display_error_message(f"You do not have {item_from_inventory.title()} in your inventory".center(119),3,0)
+            util.press_any_button(2,0,True)
         else:
             util.clear_screen()
             ui.display_message("Your inventory is empty.".center(119),3,0)
-            util.press_any_button(4,0,True)
+            util.press_any_button(2,0,True)
             return player["equipment"][number_of_part_equipment]
         
 def wear_equipment(player):
@@ -720,7 +724,9 @@ def wear_equipment(player):
         util.clear_screen()
         ui.display_equipment(player)
         equipment = player["equipment"]
-        part_of_equipment = util.get_input("Choose your part of equipment").title()
+        ui.display_message("Choose your part of equipment: ".center(119),2,0)
+        print()
+        part_of_equipment = input("".rjust(119//2)).title()
         if part_of_equipment == "Head":
             filtred_item = filter_items(player["inventory"],"Armor","Helmet")
             player["armor"] -= equipment[0]["value"]
@@ -746,8 +752,12 @@ def wear_equipment(player):
             player["attack"] -= equipment[4]["value"]
             equipment[4] = choose_item_to_wear(filtred_item,player,4)
             player["attack"] += equipment[4]["value"]
+        elif part_of_equipment in ["", "Return"]:
+            return "pressed_enter"
         else:
-            break
+            util.clear_screen()
+            ui.display_error_message("No such part of equipement".center(119),3,0)
+            util.press_any_button(2,0,True)
     
 def use_item(player):
     inventory = list(player["inventory"])

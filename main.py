@@ -159,8 +159,9 @@ def main():
                 util.press_any_button(4,0,True)
 
             elif key =="b":
-                engine.wear_equipment(player)
-                util.press_any_button(3 ,0,True)
+                user_input = engine.wear_equipment(player)
+                if user_input != "pressed_enter":
+                    util.press_any_button(2 ,0,True)
 
             #Changing board level
             player_location_row, player_location_col = player["player_location"]

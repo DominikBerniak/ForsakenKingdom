@@ -61,11 +61,12 @@ def display_boss_board(board):
             print()
 
 def display_equipment(player):
-    display_title("Your Equipment",4)
+    # display_title("Your Equipment".center(119),3,0)
     equipment = player["equipment"]
-    equipment_headers = ["Head","Chest","Legs","Shoes","Weapons"]
-    for i in range(len(equipment_headers)):
-        print(f"\n\n    {equipment_headers[i]} : {equipment[i]['name']}   {equipment[i]['type']}= {equipment[i]['value']}")
+    equipment_headers = ["Head: ","Chest: ","Legs: ","Shoes: ","Weapons: "]
+    display_inventory(equipment,"Your Equipment\n",equipment_headers)
+    # for i in range(len(equipment_headers)):
+    #     print(f"\n\n    {equipment_headers[i]} : {equipment[i]['name']}   {equipment[i]['type']}= {equipment[i]['value']}")
 
 def display_stats(player_stats,board,new_lines=0, divider = ", the ", cut = 7):
     """
@@ -91,52 +92,18 @@ def display_stats(player_stats,board,new_lines=0, divider = ", the ", cut = 7):
     stats_to_display = [[],[]]
     stats_to_display[0] = [stats[x] for x in range(len(stats)) if x <5]
     stats_to_display[1] = [stats[x] for x in range(len(stats)) if x >4]
-    cell_width = longest_word + 2
     
     first_row = f"{stats_to_display[0][0]}{divider}{stats_to_display[0][1]} "
-    # name_race_width = len(first_row)
-    # for i in range(2,len(stats_to_display[0])):
-    #     word_lenght = len(stats_to_display[0][i])
-    #     filler = (cell_width - word_lenght) // 2 * " "
-    #     filler_2 = (cell_width - word_lenght - len(filler)) * " "
-    #     first_row += "|" + filler + stats_to_display[0][i] +  filler_2
-
     for i in range(2,len(stats_to_display[0])):
         first_row += "| " + stats_to_display[0][i] + " "
-
-    # second_row = " "
-    # for i in range(len(stats_to_display[1])):
-    #     word_lenght = len(stats_to_display[1][i])
-    #     filler = (cell_width - word_lenght) // 2 * " "
-    #     filler_2 = (cell_width - word_lenght - len(filler)) * " "
-    #     second_row += filler + stats_to_display[1][i] +  filler_2 + "|"
-    
     second_row = ""
     for i in range(len(stats_to_display[1])):
         second_row += stats_to_display[1][i] + " | "
-
-    # board_width = len(board[0])
-    # left_indent = "\n" + ' '*((board_width//2) - (len(first_row)//2)+4)
-    # first_row = left_indent + first_row
-    # second_row = left_indent + ' ' *name_race_width + second_row
     new_lines = "\n" * new_lines
     print(new_lines)
     print(f"{first_row}".center(len(board[0])+3))
     print()
     print(f"{second_row[:-2]}".center(len(board[0])+6))
-
-
-
-
-
-# def display_menu(title, list_options):
-#     display_title(f"   {title}\n")
-#     for i in range(1,len(list_options)):
-#         print(f"    ({i}) {list_options[i]}")
-#     print(f"\n    (0) {list_options[0]}\n")
-
-
-            #testing centered menu
 
 def display_menu(title, list_options):
     longest_option_lenght = len(max(list_options, key=len))
@@ -164,7 +131,7 @@ def display_race_choices(races):
         if i < len(races)-1:
             print("\n    ============================")
             
-def display_inventory(inventory, lable = "Inventory:\n"):
+def display_inventory(inventory, lable = "Inventory:\n",header = None):
     # inventory = [{'type': str, 'name': str, 'value': int}, ...]
     inventory = sorted(inventory, key=lambda x: x["type"])
     longest_name = len(inventory[0]["name"])
@@ -193,7 +160,9 @@ def display_inventory(inventory, lable = "Inventory:\n"):
         filler_name = (longest_name - name_lenght + 2)*" "
         filler_type = (longest_type - type_lenght + 2)*" "
         filler_value = (longest_value - value_lenght + 2)*" "
-        if inventory[i]["name"] != "Gold":
+        if header:
+            display_message(f"{header[i]}{inventory[i]['name']}{filler_name}:  {inventory[i]['type']}{filler_type}=  {inventory[i]['value']}{filler_value}".center(119),1,filler=0)
+        elif inventory[i]["name"] != "Gold" and not header:
             display_message(f"{inventory[i]['name']}{filler_name}:  {inventory[i]['type']}{filler_type}=  {inventory[i]['value']}{filler_value}".center(119),1,filler=0)
         else:
             is_gold_in_inventory = True
