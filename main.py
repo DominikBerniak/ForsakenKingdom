@@ -11,6 +11,7 @@ NPC_SHOP_ICON = '$'
 NPC_QUEST_ICON = "?"
 ENEMY_ICON = 'T'
 ITEM_ICON = '&'
+BOSS_ICON = 'B'
 
 PLAYER_START_ROW = 30
 PLAYER_START_COL = 57
@@ -47,6 +48,7 @@ def main():
         engine.put_npc_quest_on_board(boards,NPC_QUEST_ICON)
         engine.put_enemy_on_board(boards,ENEMY_ICON)
         engine.put_item_on_board(boards,ITEM_ICON)
+        engine.get_boss_location(boards[0],BOSS_ICON)
 
         if option == "load_game":
             player = {}

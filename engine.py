@@ -819,10 +819,10 @@ def interaction_with_traders(player,board_level):
             util.press_any_button(1,0,True)
             break
 
-def get_boss_location(board):
+def get_boss_location(board,boss_icon):
     for row in range(len(board)):
         for col in range(len(board[0])):
-            if board[row][col] == "B":
+            if board[row][col] == boss_icon:
                 return [row,col]
 
 def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_icon,item_icon,board_level,door_icon):

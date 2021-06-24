@@ -1,5 +1,5 @@
 from util import clear_screen
-from engine import get_boss_location
+import engine
 
 def display_message(message, new_lines=0,filler = 4):
     new_lines = "\n"*new_lines
@@ -42,7 +42,7 @@ def display_dark_board(board,player):
 
 def display_boss_board(board):
     boss_range = 1
-    boss_location = get_boss_location(board)
+    boss_location = engine.get_boss_location(board)
     print("\n")
     for i in range(len(board)):
         for j in range(len(board[0])):
