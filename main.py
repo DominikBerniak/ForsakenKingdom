@@ -36,6 +36,7 @@ def player_dead(player):
 
 def player_win(player):
     util.clear_screen()
+    engine.story("end_story.txt")
     ui.display_title("You win")
     engine.hall_of_fame("result",player['lvl'],player['exp'], player['name'])
     ui.display_message(f"You have achieved {player['lvl']} level.",2)
