@@ -25,6 +25,18 @@ def display_board(board):
         row = row.replace("O", " ")
         print(row)
 
+def display_dark_board(board,player):
+    torch_range = 4
+    print("\n")
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if j > player["player_location"][1]-torch_range and j <player["player_location"][1]+ torch_range and i > player["player_location"][0] - torch_range and i < player["player_location"][0] + torch_range:
+                print(board[i][j],end="")
+            else:
+                print(" ",end="")
+        print()
+
+
 def display_equipment(player):
     display_title("Your Equipment",4)
     equipment = player["equipment"]
