@@ -371,14 +371,13 @@ You will also meet quest npcs marked with "?" who will give you tasks to do."""
     util.press_any_button(4,0,True)
     util.clear_screen()
 
-def hall_of_fame(player_level, mode, current_exp, player_name):
-    ui.clear_screen()
+def hall_of_fame(mode,player_level=0, current_exp = 0, player_name=""):
     if mode == "result":
         try:
             HOF_scores = open(r"hall_of_fame.txt", "a+")
             HOF_scores.write(f"{player_name}|{100 * player_level + current_exp}\n")
         except:
-            print("Program encountered critical error! (error type: missing file)")
+            ui.display_message("Program encountered critical error! (error type: missing file)")
     if mode == "scoreboard":
         scoreboard = []
         try:
@@ -390,9 +389,10 @@ def hall_of_fame(player_level, mode, current_exp, player_name):
             line[1] = int(line[1])
             scoreboard.append(line)
         sorted_score = sorted(scoreboard, key=lambda x: x[1])[:10]
+        util.clear_screen()
         for count,score in enumerate(sorted_score, start=1):
-            print(count, *score)
-    util.press_any_button(new_lines=0, indent=4)
+            ui.display_message(f"{count} {score[0]} {int(score[1])}")
+        util.press_any_button()
     util.clear_screen()
 
 def create_menu():
@@ -410,7 +410,7 @@ def load_module(option):
     elif option == 2:
         return "load_game"
     elif option == 3:
-        hall_of_fame(0,"scoreboard", 0, "none")
+        hall_of_fame("scoreboard")
     elif option == 4:
         authors()
     elif option == 5:
@@ -521,7 +521,7 @@ def do_quest(player,board_lvl):
     if not have_key_in_inventory(player["inventory"]) or npc["is_done"]:
         util.clear_screen()
         ui.display_message(npc["name"] + ": "+npc["quest_description"])
-        answer = util.get_input(npc["name"]+": "+npc["quest"])
+        answer = util.get_input(npc["name"]+": "+npc["quest"]).lower()
         reward = npc["reward"]
 
         if answer == npc["answer"]:
@@ -555,8 +555,8 @@ def update_gold_in_inventory(inventory,amount_of_gold):
 
 def create_boss():
     boss = {
-        "adjective":"",
-        "name":"Yoshi, the Dog",
+        "adjective":"Demonic",
+        "name":"Yoshi",
         "health":200,
         "attack":35,
         "armor":20,
@@ -663,7 +663,7 @@ def filter_items(inventory,type,part_of_armor=""):
             item_name = item["name"].split(" ")
             if part_of_armor in item_name:
                 filtred_inventory.append(item)
-    elif type == "Weapons":
+    elif type == "Attack":
         for item in inventory:
             if item["type"] == type:
                 filtred_inventory.append(item)
@@ -720,7 +720,7 @@ def wear_equipment(player):
             equipment[3] = choose_item_to_wear(filtred_item,player,3)
             player["armor"] += equipment[3]["value"]
         elif part_of_equipment == "Weapons":
-            filtred_item = filter_items(player["inventory"],"Weapons")
+            filtred_item = filter_items(player["inventory"],"Attack")
             player["attack"] -= equipment[4]["value"]
             equipment[4] = choose_item_to_wear(filtred_item,player,4)
             player["attack"] += equipment[4]["value"]
@@ -878,7 +878,7 @@ def get_boss_location(board,boss_icon):
         for col in range(len(board[0])):
             if board[row][col] == boss_icon:
                 return [row,col]
-    return [20,20]
+    return [False]
 
 def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_icon,item_icon,board_level,door_icon,treasure_icon,boss_icon):
     if board[player_row][player_col] == quest_icon:
@@ -935,7 +935,7 @@ def move_enemies_randomly(board,enemy_icon,player,is_boss = False):
     while i < len(enemy_cords):
         enemy_current_row = enemy_cords[i][0]
         enemy_current_col = enemy_cords[i][1]
-        if is_next_to_player(enemy_current_row+range_of_enemy,enemy_current_col+range_of_enemy,player):
+        if is_next_to_player(enemy_current_row,enemy_current_col,player):
             board[enemy_current_row][enemy_current_col] = " "
             if is_boss:
                 return fight_enemy(player,board,True)

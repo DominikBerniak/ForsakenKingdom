@@ -37,7 +37,7 @@ def player_dead(player):
 def player_win(player):
     util.clear_screen()
     ui.display_title("You win")
-    #dodawanie do Hall_Of_fame
+    engine.hall_of_fame("result",player['lvl'],player['exp'], player['name'])
     ui.display_message(f"You have achieved {player['lvl']} level.",2)
     util.press_any_button(4)
     return main()
@@ -56,7 +56,7 @@ def main():
         if option == "start_game":
             util.clear_screen()
             player = engine.create_player(PLAYER_START_ROW,PLAYER_START_COL,PLAYER_ICON)
-        boards = [level_1 ,level_2,level_3,engine.create_board(BOARD_WIDTH, BOARD_HEIGHT)]
+        boards = [level_1 ,level_2,level_3,engine.create_board(BOSS_BOARD_WIDTH, BOSS_BOARD_WIDTH)]
         board_level = [0]
         escaped_cave = False
         engine.put_door_on_board(boards,CLOSED_DOOR_ICON)
@@ -65,8 +65,6 @@ def main():
         engine.put_treasure_on_board(boards,TREASURE_ICON)
         engine.put_enemy_on_board(boards,ENEMY_ICON)
         engine.put_item_on_board(boards,ITEM_ICON)
-        boss_board = engine.create_board(BOSS_BOARD_WIDTH, BOSS_BOARD_HEIGHT)
-        boards.append(boss_board)
         engine.put_boss_on_board(boards[BOSS_LEVEL],BOSS_ICON)
         
         
