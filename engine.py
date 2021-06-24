@@ -185,6 +185,18 @@ def open_the_door(board,player):
         util.press_any_button()
         ui.display_board(board)
         
+def is_next_to_player(enemy_row,enemy_col,player):
+    player_row, player_col = player["player_location"]
+    if enemy_row + 1 == player_row and enemy_col == player_col:
+        return True
+    elif enemy_row - 1 == player_row and enemy_col == player_col:
+        return True
+    elif enemy_row == player_row and enemy_col + 1 == player_col:
+        return True
+    elif enemy_row == player_row and enemy_col - 1 == player_col:
+        return True
+    return False
+
 
 def put_npc_quest_on_board(board,npc_quest_icon):
     for i in range(len(board)):
@@ -777,3 +789,33 @@ def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_i
         util.press_any_button(1,0,True)
         util.clear_screen()
         return [1]
+
+def move_enemies_randomly(board,enemy_icon,player):
+    enemy_cords = []
+    for x in range(len(board)):
+        for y in range(len(board[0])):
+            if board[x][y] == enemy_icon:
+                enemy_cords.append([x,y])        
+
+    i = 0
+    while i < len(enemy_cords):
+        enemy_current_row = enemy_cords[i][0]
+        enemy_current_col = enemy_cords[i][1]
+        if is_next_to_player(enemy_current_row,enemy_current_col,player):
+            board[enemy_current_row][enemy_current_col] = " "
+            return fight_enemy(player,board)
+        
+        random_row_move = random.choice([-1,0,0,0,0,0,1])
+        if random_row_move in [-1,1]:
+            random_col_move = 0
+        else:
+            random_col_move = random.choice([-1,0,0,0,0,0,1])
+        if is_unoccupied(board,enemy_current_row+random_row_move,enemy_current_col+random_col_move):
+            board[enemy_current_row][enemy_current_col] = " "
+            board[enemy_current_row+random_row_move][enemy_current_col+random_col_move] = enemy_icon
+            i+=1
+        else:
+            i+=1
+            
+
+    
