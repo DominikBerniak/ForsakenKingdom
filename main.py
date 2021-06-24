@@ -54,7 +54,7 @@ def main():
         while True:
             util.clear_screen()
             engine.put_player_on_board(boards[board_level[0]], player, PLAYER_ICON)
-            ui.display_board(boards[board_level[0]],player)
+            ui.display_board(boards[board_level[0]])
             ui.display_stats(player,boards[board_level[0]],2)
             player_location_row, player_location_col = player["player_location"]
 
@@ -68,7 +68,6 @@ def main():
                         return quit()
                 elif pause_option == "back_to_menu":
                     return main()
-
 
             elif key == "w" and engine.is_not_wall(boards[board_level[0]], player_location_row-1, player_location_col):
                 if engine.is_unoccupied(boards[board_level[0]],player_location_row-1,player_location_col):
