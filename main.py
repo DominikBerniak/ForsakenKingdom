@@ -59,14 +59,9 @@ def main():
         if option == "start_game":
             util.clear_screen()
             player = engine.create_player(PLAYER_START_ROW,PLAYER_START_COL,PLAYER_ICON)
-<<<<<<< HEAD
         boards = [level_1 ,level_2,engine.create_board(BOARD_WIDTH, BOARD_HEIGHT)]
         board_level = [2]
         engine.put_door_on_board(boards,CLOSED_DOOR_ICON)
-=======
-        boards = [engine.create_board(BOARD_WIDTH, BOARD_HEIGHT),engine.create_board(BOARD_WIDTH, BOARD_HEIGHT),engine.create_board(BOARD_WIDTH, BOARD_HEIGHT)]
-        board_level = [3]
->>>>>>> 286505b (implement fight with boss)
         engine.put_npc_shop_on_board(boards,NPC_SHOP_ICON)
         engine.put_npc_quest_on_board(boards,board_level[0],NPC_QUEST_ICON)
         engine.put_treasure_on_board(boards,board_level[0],TREASURE_ICON)
@@ -110,11 +105,7 @@ def main():
                     engine.move_enemies_randomly(boards[board_level[0]],ENEMY_ICON,player)
                     engine.move_enemies_randomly(boards[board_level[0]],BOSS_ICON,player,True)
                 else:
-<<<<<<< HEAD
-                    player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row-1,player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,TREASURE_ICON)
-=======
-                    player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row-1,player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,BODY_BOSS_ICON)
->>>>>>> 286505b (implement fight with boss)
+                    player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row-1,player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,TREASURE_ICON,BODY_BOSS_ICON)
                     player["player_location"][0] -= player_encounter[0]
                     if len(player_encounter) > 1 and player_encounter[1] == "defeat":
                         return player_dead(player)
@@ -128,11 +119,7 @@ def main():
                     engine.move_enemies_randomly(boards[board_level[0]],ENEMY_ICON,player)
                     engine.move_enemies_randomly(boards[board_level[0]],BOSS_ICON,player,True)
                 else:
-<<<<<<< HEAD
-                    player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row+1, player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,TREASURE_ICON)
-=======
-                    player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row+1, player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,BODY_BOSS_ICON)
->>>>>>> 286505b (implement fight with boss)
+                    player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row+1, player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,TREASURE_ICON,BODY_BOSS_ICON)
                     player["player_location"][0] += player_encounter[0]
                     if len(player_encounter) > 1 and player_encounter[1] == "defeat":
                         return player_dead(player)
@@ -146,11 +133,7 @@ def main():
                     engine.move_enemies_randomly(boards[board_level[0]],ENEMY_ICON,player)
                     engine.move_enemies_randomly(boards[board_level[0]],BOSS_ICON,player,True)
                 else:
-<<<<<<< HEAD
-                    player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row,player_location_col-1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,TREASURE_ICON) 
-=======
-                    player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row,player_location_col-1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,BODY_BOSS_ICON) 
->>>>>>> 286505b (implement fight with boss)
+                    player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row,player_location_col-1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,TREASURE_ICON,,BODY_BOSS_ICON) 
                     player["player_location"][1] -= player_encounter[0]
                     if len(player_encounter) > 1 and player_encounter[1] == "defeat":
                         return player_dead(player)
@@ -164,11 +147,7 @@ def main():
                     engine.move_enemies_randomly(boards[board_level[0]],ENEMY_ICON,player)
                     engine.move_enemies_randomly(boards[board_level[0]],BOSS_ICON,player,True)
                 else:
-<<<<<<< HEAD
-                    player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row,player_location_col+1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,TREASURE_ICON) 
-=======
-                    player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row,player_location_col+1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,BODY_BOSS_ICON) 
->>>>>>> 286505b (implement fight with boss)
+                    player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row,player_location_col+1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,TREASURE_ICON,BODY_BOSS_ICON) 
                     player["player_location"][1] += player_encounter[0]
                     if len(player_encounter) > 1 and player_encounter[1] == "defeat":
                         return player_dead(player)

@@ -221,8 +221,6 @@ def is_next_to_player(enemy_row,enemy_col,player):
         return True
     return False
 
-<<<<<<< HEAD
-
 def put_npc_quest_on_board(board,board_level,npc_quest_icon):
     if board_level == 0:
         npc_row = 6
@@ -231,16 +229,6 @@ def put_npc_quest_on_board(board,board_level,npc_quest_icon):
         npc_row = 12
         npc_col = 21
     board[board_level][npc_row][npc_col] = npc_quest_icon
-=======
-def put_npc_quest_on_board(board,npc_quest_icon):
-    for i in range(len(board)):
-        npc_row = random.randint(1, len(board[i])-2)
-        npc_col = random.randint(1, len(board[i][0])-2)
-        while not is_unoccupied(board[i],npc_row,npc_col):
-            npc_row = random.randint(1, len(board[i])-2)
-            npc_col = random.randint(1, len(board[i][0])-2)
-        board[i][npc_row][npc_col] = npc_quest_icon
->>>>>>> 286505b (implement fight with boss)
 
 def put_npc_shop_on_board(board,npc_shop_icon):
     for i in range(len(board)):
@@ -866,7 +854,6 @@ def interaction_with_traders(player,board_level):
             ui.display_error_message(f"{npcs[board_level]['name']}: I don't understand. See you later!".center(119),filler=0)
             util.press_any_button(1,0,True)
             break
-
 
 def get_boss_location(board,boss_icon):
     for row in range(len(board)):
