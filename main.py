@@ -14,9 +14,10 @@ ENEMY_ICON = 'T'
 ITEM_ICON = '&'
 TREASURE_ICON = "+"
 BOSS_ICON = 'B'
+BODY_BOSS_ICON ='+'
 
-PLAYER_START_ROW = 30
-PLAYER_START_COL = 57
+PLAYER_START_ROW = 28
+PLAYER_START_COL = 2
 
 # PLAYER_ICON = '='
 # PLAYER_START_ROW = 5
@@ -24,7 +25,11 @@ PLAYER_START_COL = 57
 
 BOARD_WIDTH = 115
 BOARD_HEIGHT = 30
+BOSS_BOARD_WIDTH = 50
+BOSS_BOARD_HEIGHT = 30
 
+CAVE_LEVEL = 2
+BOSS_LEVEL = 3
 
 def player_dead(player):
     util.clear_screen()
@@ -33,6 +38,13 @@ def player_dead(player):
     util.press_any_button(4)
     return main()
 
+def player_win(player):
+    util.clear_screen()
+    ui.display_title("You win")
+    #dodawanie do Hall_Of_fame
+    ui.display_message(f"You have achieved {player['lvl']} level.",2)
+    util.press_any_button(4)
+    return main()
 
 def quit():
     ui.clear_screen()
@@ -47,15 +59,23 @@ def main():
         if option == "start_game":
             util.clear_screen()
             player = engine.create_player(PLAYER_START_ROW,PLAYER_START_COL,PLAYER_ICON)
+<<<<<<< HEAD
         boards = [level_1 ,level_2,engine.create_board(BOARD_WIDTH, BOARD_HEIGHT)]
         board_level = [2]
         engine.put_door_on_board(boards,CLOSED_DOOR_ICON)
+=======
+        boards = [engine.create_board(BOARD_WIDTH, BOARD_HEIGHT),engine.create_board(BOARD_WIDTH, BOARD_HEIGHT),engine.create_board(BOARD_WIDTH, BOARD_HEIGHT)]
+        board_level = [3]
+>>>>>>> 286505b (implement fight with boss)
         engine.put_npc_shop_on_board(boards,NPC_SHOP_ICON)
         engine.put_npc_quest_on_board(boards,board_level[0],NPC_QUEST_ICON)
         engine.put_treasure_on_board(boards,board_level[0],TREASURE_ICON)
         engine.put_enemy_on_board(boards,ENEMY_ICON)
         engine.put_item_on_board(boards,ITEM_ICON)
-        engine.get_boss_location(boards[0],BOSS_ICON)
+        engine.put_door_on_board(boards,CLOSED_DOOR_ICON)
+        boss_board = engine.create_board(BOSS_BOARD_WIDTH, BOSS_BOARD_HEIGHT)
+        boards.append(boss_board)
+        engine.put_boss_on_board(boards[BOSS_LEVEL],BOSS_ICON)
 
         if option == "load_game":
             player = {}
@@ -65,6 +85,8 @@ def main():
             engine.put_player_on_board(boards[board_level[0]], player, PLAYER_ICON)
             if board_level[0] == 2: 
                 ui.display_dark_board(boards[board_level[0]],player)
+            elif board_level[0] == 3:
+                ui.display_boss_board(boards[board_level[0]])
             else:
                 ui.display_board(boards[board_level[0]])
             ui.display_stats(player,boards[board_level[0]],2)
@@ -86,45 +108,73 @@ def main():
                     player["player_location"][0] -= 1
                     # winsound.Beep(150,100)
                     engine.move_enemies_randomly(boards[board_level[0]],ENEMY_ICON,player)
+                    engine.move_enemies_randomly(boards[board_level[0]],BOSS_ICON,player,True)
                 else:
+<<<<<<< HEAD
                     player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row-1,player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,TREASURE_ICON)
+=======
+                    player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row-1,player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,BODY_BOSS_ICON)
+>>>>>>> 286505b (implement fight with boss)
                     player["player_location"][0] -= player_encounter[0]
                     if len(player_encounter) > 1 and player_encounter[1] == "defeat":
                         return player_dead(player)
+                    elif len(player_encounter) > 1 and player_encounter[1] == "final_victory":
+                        return player_win(player)
 
             elif key == "s" and engine.is_not_wall(boards[board_level[0]], player_location_row+1, player_location_col):
                 if engine.is_unoccupied(boards[board_level[0]],player_location_row+1,player_location_col):
                     player["player_location"][0] += 1
                     # winsound.Beep(150,100)
                     engine.move_enemies_randomly(boards[board_level[0]],ENEMY_ICON,player)
+                    engine.move_enemies_randomly(boards[board_level[0]],BOSS_ICON,player,True)
                 else:
+<<<<<<< HEAD
                     player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row+1, player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,TREASURE_ICON)
+=======
+                    player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row+1, player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,BODY_BOSS_ICON)
+>>>>>>> 286505b (implement fight with boss)
                     player["player_location"][0] += player_encounter[0]
                     if len(player_encounter) > 1 and player_encounter[1] == "defeat":
                         return player_dead(player)
+                    elif len(player_encounter) > 1 and player_encounter[1] == "final_victory":
+                        return player_win(player)
 
             elif key == "a" and engine.is_not_wall(boards[board_level[0]], player_location_row, player_location_col-1):
                 if engine.is_unoccupied(boards[board_level[0]],player_location_row,player_location_col-1):
                     player["player_location"][1] -= 1 
                     # winsound.Beep(150,100)
                     engine.move_enemies_randomly(boards[board_level[0]],ENEMY_ICON,player)
+                    engine.move_enemies_randomly(boards[board_level[0]],BOSS_ICON,player,True)
                 else:
+<<<<<<< HEAD
                     player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row,player_location_col-1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,TREASURE_ICON) 
+=======
+                    player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row,player_location_col-1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,BODY_BOSS_ICON) 
+>>>>>>> 286505b (implement fight with boss)
                     player["player_location"][1] -= player_encounter[0]
                     if len(player_encounter) > 1 and player_encounter[1] == "defeat":
                         return player_dead(player)
+                    elif len(player_encounter) > 1 and player_encounter[1] == "final_victory":
+                        return player_win(player)
 
             elif key == "d" and engine.is_not_wall(boards[board_level[0]], player_location_row, player_location_col+1):
                 if engine.is_unoccupied(boards[board_level[0]],player_location_row,player_location_col+1):
                     player["player_location"][1] += 1 
                     # winsound.Beep(150,100)
                     engine.move_enemies_randomly(boards[board_level[0]],ENEMY_ICON,player)
+                    engine.move_enemies_randomly(boards[board_level[0]],BOSS_ICON,player,True)
                 else:
+<<<<<<< HEAD
                     player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row,player_location_col+1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,TREASURE_ICON) 
+=======
+                    player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row,player_location_col+1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON,BODY_BOSS_ICON) 
+>>>>>>> 286505b (implement fight with boss)
                     player["player_location"][1] += player_encounter[0]
                     if len(player_encounter) > 1 and player_encounter[1] == "defeat":
                         return player_dead(player)
-
+                    elif len(player_encounter) > 1 and player_encounter[1] == "final_victory":
+                        return player_win(player)
+                        
             elif key == "i":
                 if len(player["inventory"])>0:
                     ui.display_inventory(player["inventory"])
