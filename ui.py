@@ -32,7 +32,7 @@ def display_dark_board(board,player):
     print("\n")
     for i in range(len(board)):
         for j in range(len(board[0])):
-            if j > player["player_location"][1]-torch_range and j <player["player_location"][1]+ torch_range and i > player["player_location"][0] - torch_range and i < player["player_location"][0] + torch_range:
+            if j > player["player_location"][1]-torch_range and j <player["player_location"][1]+ torch_range and i > player["player_location"][0] - torch_range and i < player["player_location"][0] + torch_range or board[i][j]=="O":
                 if board[i][j] != " ":
                     print(board[i][j],end="")
                 else:
@@ -44,14 +44,13 @@ def display_dark_board(board,player):
 def display_boss_board(board):
     boss_range = 3
     boss_location = engine.get_boss_location(board,BOSS_ICON)
-    boss_design = [BODY_BOSS_ICON] * 6 +["O"," ","O"]+[BODY_BOSS_ICON] * 2+[" ",BOSS_ICON," ",]+[BODY_BOSS_ICON] * 2+["V"]*3+[BODY_BOSS_ICON] * 6
+    boss_design = [BODY_BOSS_ICON] * 6 +["Q"," ","Q"]+[BODY_BOSS_ICON] * 2+[" ",BOSS_ICON," ",]+[BODY_BOSS_ICON] * 2+["V"]*3+[BODY_BOSS_ICON] * 6
     index_of_boss_design = 0
     print("\n")
     if boss_location[0]:
         for i in range(len(board)):
             for j in range(len(board[0])):
                 if j > boss_location[1] - boss_range and j < boss_location[1]+ boss_range and i > boss_location[0] - boss_range and i < boss_location[0] + boss_range:
-                    # print(boss_design[index_of_boss_design],end="")
                     board[i][j] = boss_design[index_of_boss_design]
                     index_of_boss_design += 1
                 else:
