@@ -1,4 +1,5 @@
 from util import clear_screen
+from engine import get_boss_location
 
 def display_message(message, new_lines=0,filler = 4):
     new_lines = "\n"*new_lines
@@ -31,16 +32,34 @@ def display_dark_board(board,player):
     for i in range(len(board)):
         for j in range(len(board[0])):
             if j > player["player_location"][1]-torch_range and j <player["player_location"][1]+ torch_range and i > player["player_location"][0] - torch_range and i < player["player_location"][0] + torch_range:
-                print(board[i][j],end="")
+                if board[i][j] != " ":
+                    print(board[i][j],end="")
+                else:
+                    print(".",end="")
             else:
                 print(" ",end="")
         print()
+
+def display_boss_board(board):
+    boss_range = 1
+    boss_location = get_boss_location(board)
+    print("\n")
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if j == boss_location[1]-boss_range and j == boss_location["boss_location"][1]+ boss_range and i == boss_location["boss_location"][0] - boss_range and i == boss_location["boss_location"][0] + boss_range:
+                print("*",end="")
+            elif j > boss_location[1]-boss_range and j <boss_location["boss_location"][1]+ boss_range and i > boss_location["boss_location"][0] - boss_range and i < boss_location["boss_location"][0] + boss_range:
+                print(".",end="")
+            else:
+                print(board[i][j],end="")
+        print()
+
 
 
 def display_equipment(player):
     display_title("Your Equipment",4)
     equipment = player["equipment"]
-    equipment_headers = ["Head","Chest","Legs","Shoes","Weapon"]
+    equipment_headers = ["Head","Chest","Legs","Shoes","Weapons"]
     for i in range(len(equipment_headers)):
         print(f"\n\n    {equipment_headers[i]} : {equipment[i]['name']}   {equipment[i]['type']}= {equipment[i]['value']}")
 

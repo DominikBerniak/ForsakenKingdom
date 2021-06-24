@@ -65,7 +65,7 @@ def create_player(player_start_row, player_start_col, player_icon):
                 ui.display_error_message("    Wrong race name!")
                 sleep(2)      
         player_stats.update({"player_location": [player_start_row,player_start_col],
-                                "player_icon":player_icon, "inventory": [],"equipment": []})
+                                "player_icon":player_icon, "inventory": [start_gold],"equipment": equipment})
         ui.clear_screen()
         if util.get_confirmation(f"""You've created {player_stats["name"]}, the {player_stats["race"]}.
     
@@ -189,17 +189,20 @@ def find_the_door(board):
             if board[row][col] == "X":
                 return row,col
 
+def delete_key_from_inventory(inventory):
+    for index in range(len(inventory)):
+        if inventory[index]["name"] == "Key":
+            del inventory[index]
+
 def open_the_door(board,player):
     enter_door_row,enter_door_col = find_the_door(board)
     if have_key_in_inventory(player["inventory"]) != False:
         util.clear_screen()
         board[enter_door_row][enter_door_col] =" "
-        ui.display_board(board)
+        delete_key_from_inventory(player["inventory"])
     else:
-        util.clear_screen()
         ui.display_message("Not have a key!!! Go find it!!")
         util.press_any_button()
-        ui.display_board(board)
 
 def put_npc_quest_on_board(board,npc_quest_icon):
     for i in range(len(board)):
@@ -234,12 +237,12 @@ def put_enemy_on_board(board,enemy_icon):
     for i in range(len(board)):
         number_of_enemies = random.randint(10,15)
         while number_of_enemies > 0:
-            npc_row = random.randint(1, len(board[i])-2)
-            npc_col = random.randint(1, len(board[i][0])-2)
-            while not is_unoccupied(board[i],npc_row,npc_col):
-                npc_row = random.randint(1, len(board[i])-2)
-                npc_col = random.randint(1, len(board[i][0])-2)
-            board[i][npc_row][npc_col] = enemy_icon
+            enemy_row = random.randint(1, len(board[i])-2)
+            enemy_col = random.randint(1, len(board[i][0])-2)
+            while not is_unoccupied(board[i],enemy_row,enemy_col):
+                enemy_row = random.randint(1, len(board[i])-2)
+                enemy_col = random.randint(1, len(board[i][0])-2)
+            board[i][enemy_row][enemy_col] = enemy_icon
             number_of_enemies -= 1
 
 def random_item_name(type,type_description):
@@ -497,14 +500,25 @@ def update_gold_in_inventory(inventory,amount_of_gold):
                 raise ValueError
             else:
                 inventory[index]["value"] += amount_of_gold
-                
+
+def create_boss():
+    boss = {
+        "adjective":"Godness",
+        "name":"Yoshi, the Dog",
+        "health":[200],
+        "attack":35,
+        "armor":20,
+        "icon":"B"
+    }
+    return boss
+
 def create_enemy(player):
-    skeleton = {"adjective": "","name":"Skeleton","health":[5,50],"attack": 10,"armor":75, "exp": 10}
-    ghoul = {"adjective": "","name":"Ghoul","health":[15,50],"attack": 20,"armor":5, "exp": 15}
-    boar = {"adjective": "","name":"Boar","health":[50,200],"attack": 10,"armor":40, "exp": 25}
-    spider = {"adjective": "","name":"Spider","health":[10,50],"attack": 15,"armor":20, "exp": 15}
-    ghost = {"adjective": "","name":"Ghost","health":[1,5],"attack": 3,"armor":100, "exp": 5}
-    ogre = {"adjective": "","name":"Ogre","health":[20,75],"attack": 25,"armor":100, "exp": 75}
+    skeleton = {"adjective": "","name":"Skeleton","health":[5,50],"attack": 10,"armor":5, "exp": 10}
+    ghoul = {"adjective": "","name":"Ghoul","health":[15,50],"attack": 20,"armor":0, "exp": 15}
+    boar = {"adjective": "","name":"Boar","health":[50,200],"attack": 10,"armor":2, "exp": 25}
+    spider = {"adjective": "","name":"Spider","health":[10,50],"attack": 15,"armor":0, "exp": 15}
+    ghost = {"adjective": "","name":"Ghost","health":[1,5],"attack": 7,"armor":0, "exp": 5}
+    ogre = {"adjective": "","name":"Ogre","health":[20,75],"attack": 25,"armor":10, "exp": 75}
     enemy = random.choice([skeleton, ghoul, boar, spider, ghost, ogre])
 
     enemy_adjectives = ["Mighty", "Fearless", "Powerful", "Deadly", "Ferocious", "Horrifying", "Frightening", "Spooky", "Ghostly"]
@@ -791,6 +805,12 @@ def interaction_with_traders(player,board_level):
             ui.display_error_message(f"{npcs[board_level]['name']}: I don't understand. See you later!".center(119),filler=0)
             util.press_any_button(1,0,True)
             break
+
+def get_boss_location(board):
+    for row in range(len(board)):
+        for col in range(len(board[0])):
+            if board[row][col] == "B":
+                return [row,col]
 
 def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_icon,item_icon,board_level,door_icon):
     if board[player_row][player_col] == quest_icon:
