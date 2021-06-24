@@ -56,6 +56,7 @@ def main():
         if option == "start_game":
             util.clear_screen()
             player = engine.create_player(PLAYER_START_ROW,PLAYER_START_COL,PLAYER_ICON)
+            engine.story("begin_story.txt",player)
         boards = [level_1,level_2,level_3]
         board_level = [0]
         escaped_cave = False
@@ -68,8 +69,6 @@ def main():
         boards.append(boss_level)
         engine.put_door_on_board(boards,CLOSED_DOOR_ICON)
         engine.put_boss_on_board(boards[BOSS_LEVEL],BOSS_ICON)
-        
-        
 
         if option == "load_game":
             player = {}
@@ -206,7 +205,6 @@ def main():
                                 util.press_any_button(2,0,True)
                                 escaped_cave = True
                         board_level[0] += 1
-            
     elif option == "quit":
         quit()
 
