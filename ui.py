@@ -2,6 +2,7 @@ from main import BOSS_ICON,BODY_BOSS_ICON
 from util import clear_screen
 import engine
 
+
 def display_message(message, new_lines=0,filler = 4):
     new_lines = "\n"*new_lines
     print(f"{new_lines}{filler*' '}{message}")

@@ -377,6 +377,26 @@ def authors():
     util.press_any_button(3,0,True)
     util.clear_screen()
 
+def story(filename,player):
+    file = open(filename,"r")
+    story = file.readlines()
+    x = 0
+    i = 0
+    while x in range(len(story)*2):
+        ui.clear_screen()
+        if x == 0:
+            story_display = story[i].center(119)
+        elif x%2 != 0:
+            story_display = "\n" + story_display
+            i+=1
+        else:
+            story_display = story[i].center(119) + "\n" + story_display
+        ui.display_message(f"{story_display}".replace("NAME",player["name"].upper()).center(119),2,filler=0)
+        sleep(0.2)
+        x+=1
+
+    util.press_any_button(3,0,True)
+    util.clear_screen()
 def instruction():
     ui.clear_screen()
     information = """Preparation for the game:
@@ -385,8 +405,17 @@ Each race has different stats. The character is moved by W/S/A/D.
 Objective:
 The main goal is to defeat the final boss,
 but before you get to this stage, you have to kill a lot of enemies.
-During your adventure you will meet shop npcs marked with "$" with whom you can trade.
-You will also meet quest npcs marked with "?" who will give you tasks to do."""
+During your adventure you will meet shop npcs with whom you can trade.
+You will also meet quest npcs who will give you tasks to do.
+Legend:
+@ - you
+X - gate
+$ - shop
+? - quest
+T - monster
+& - items 
+% - treasure
+"""
     
     information = information.split("\n")
     longest_row_lenght = len(max(information,key=len))
@@ -868,7 +897,7 @@ def fight_enemy(player,board,is_boss=False):
                 player_max_damage = (player["attack"] - enemy["armor"])
                 if player_max_damage > 0:
                     player_damage = random.randint(1,player_max_damage)
-                    enemy["health"] -= player_damage
+                    enemy["health"] -= player_damage + player["lvl"]
                 else:
                     player_damage = 0
                 if enemy["health"] > 0:
