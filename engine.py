@@ -74,8 +74,10 @@ def create_player(player_start_row, player_start_col, player_icon):
     return player_stats
 
 def save_game(player, boards, board_level):
-    with open("saved_games.py","w") as save_file:
+    with open("saved_games.py","w",encoding="utf-8") as save_file:
         save_file.write(f"player = {player}\nboards = {boards}\nboard_level = {board_level[0]}")
+    # with open("boards.py","a",encoding="utf-8") as save_file:
+    #     save_file.write(f"\nlevel_2 = {boards[board_level[0]]}")
 
 def load_game(player, boards, board_level):
     try:
@@ -128,10 +130,12 @@ def pause_menu(player, boards, board_level):
             util.clear_screen()
 
 def is_unoccupied(board,row,col):
-    return board[row][col] == " " or board[row][col] == "O"
+    # return board[row][col] == " " or board[row][col] == "O"
+    return True
 
 def is_not_wall(board, row, col):
-    return (board[row][col] != "=" and board[row][col] != "|")
+    # return (board[row][col] != "=" and board[row][col] != "|")
+    return True
 
 def get_player_placement(board, player_icon):
     for i in range(len(board)):
@@ -141,9 +145,9 @@ def get_player_placement(board, player_icon):
 
 def put_player_on_board(board, player,player_icon):
     ########zakomentować, żeby rysować######
-    cords = get_player_placement(board, player_icon)
-    if cords:
-        board[cords[0]][cords[1]] = " "
+    # cords = get_player_placement(board, player_icon)
+    # if cords:
+    #     board[cords[0]][cords[1]] = " "
     #######################################
     player_row, player_col, player_icon = player["player_location"][0],player["player_location"][1], player["player_icon"]
     board[player_row][player_col] = player_icon
@@ -214,14 +218,14 @@ def is_next_to_player(enemy_row,enemy_col,player):
     return False
 
 
-def put_npc_quest_on_board(board,npc_quest_icon):
-    for i in range(len(board)):
-        npc_row = random.randint(1, len(board[i])-2)
-        npc_col = random.randint(1, len(board[i][0])-2)
-        while not is_unoccupied(board[i],npc_row,npc_col):
-            npc_row = random.randint(1, len(board[i])-2)
-            npc_col = random.randint(1, len(board[i][0])-2)
-        board[i][npc_row][npc_col] = npc_quest_icon
+def put_npc_quest_on_board(board,board_level,npc_quest_icon):
+    if board_level == 0:
+        npc_row = 6
+        npc_col = 38
+    elif board_level == 1:
+        npc_row = 12
+        npc_col = 21
+    board[board_level][npc_row][npc_col] = npc_quest_icon
 
 def put_npc_shop_on_board(board,npc_shop_icon):
     for i in range(len(board)):
@@ -242,6 +246,12 @@ def put_item_on_board(board,item_icon):
                 item_col = random.randint(1, len(board[i][0])-2)
                 x-=1
             board[i][item_row][item_col] = item_icon
+def put_treasure_on_board(boards,board_level,treasure_icon):
+    if board_level == 0:
+        boards[board_level][7][69] = treasure_icon
+    elif board_level == 1:
+        boards[board_level][11][32] = treasure_icon
+        boards[board_level][20][23] = treasure_icon
 
 def put_enemy_on_board(board,enemy_icon):
     for i in range(len(board)):
@@ -699,8 +709,11 @@ def use_item(player):
         util.press_any_button(2,center=True)
         return False
 
-def add_random_item_to_inventory(player):
-    random_item = create_item()
+def add_random_item_to_inventory(player, is_treasure=False):
+    if not is_treasure:
+        random_item = create_item()
+    else:
+        rendom_item = {"type": "Gold", "name": "Gold", "value": 20}
     if random_item["type"] == "Gold":
         added_gold = False
         for i in range(len(player["inventory"])):
@@ -805,7 +818,7 @@ def interaction_with_traders(player,board_level):
             util.press_any_button(1,0,True)
             break
 
-def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_icon,item_icon,board_level,door_icon):
+def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_icon,item_icon,board_level,door_icon,treasure_icon):
     if board[player_row][player_col] == quest_icon:
         do_quest(player,board_level)
         return [0]
@@ -830,6 +843,9 @@ def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_i
             ui.display_message(f"You have picked up {item['value']} {item['name'].lower()}.".center(119),3,0)
         util.press_any_button(1,0,True)
         util.clear_screen()
+        return [1]
+    elif board[player_row][player_col] == treasure_icon:
+        add_random_item_to_inventory(player,is_treasure=True)
         return [1]
 
 def move_enemies_randomly(board,enemy_icon,player):
