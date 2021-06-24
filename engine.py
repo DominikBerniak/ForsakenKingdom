@@ -144,11 +144,9 @@ def get_player_placement(board, player_icon):
                 return i,j
 
 def put_player_on_board(board, player,player_icon):
-    ########zakomentować, żeby rysować######
     cords = get_player_placement(board, player_icon)
     if cords:
         board[cords[0]][cords[1]] = " "
-    #######################################
     player_row, player_col, player_icon = player["player_location"][0],player["player_location"][1], player["player_icon"]
     board[player_row][player_col] = player_icon
 
@@ -175,32 +173,6 @@ def get_next_level_old_door_location(board,row,col):
     return [row,col]
 
 def put_door_on_board(boards,door_icon):
-    # for i in range(len(boards)):
-    #     if i != 2:
-    #         enter_door_row = random.randint(0, len(boards[i])-1)
-    #         if enter_door_row in [0, len(boards[i])-1]:
-    #             enter_door_col = random.choice([1,len(boards[i][0])-2])
-    #         else:
-    #             enter_door_col = random.choice([0, len(boards[i][0])-1])
-
-
-    #         if i < len(boards)-1 and i!=1:
-    #             boards[i][enter_door_row][enter_door_col] = door_icon
-    #         elif i == 1:
-    #             enter_door_row = 0
-    #             enter_door_col = 58
-    #             boards[1][0][58] = door_icon
-    #         exit_door_row, exit_door_col = get_next_level_old_door_location(boards[0], enter_door_row, enter_door_col)
-    #         if i < len(boards)-1 and i == 0:
-    #             boards[i+1][exit_door_row][exit_door_col] = "O" #open door
-    #     else:
-    #         enter_door_row = 0
-    #         enter_door_col = 58
-    #         boards[2][enter_door_row][enter_door_col] = door_icon
-    #         exit_door_row = 31
-    #         exit_door_col = 58
-    #         boards[2][exit_door_row][exit_door_col] = "O"
-
     enter_door_row = random.randint(0, len(boards[0])-1)
     if enter_door_row in [0, len(boards[0])-1]:
         enter_door_col = random.choice([1,len(boards[0][0])-2])
