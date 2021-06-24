@@ -59,6 +59,8 @@ def main():
             engine.story("begin_story.txt",player)
         boards = [level_1,level_2,level_3]
         board_level = [0]
+        sound_on = [1]
+        unmuted = [0]
         escaped_cave = False
         engine.put_npc_shop_on_board(boards,NPC_SHOP_ICON)
         engine.put_npc_quest_on_board(boards,NPC_QUEST_ICON)
@@ -73,8 +75,23 @@ def main():
         if option == "load_game":
             player = {}
             engine.load_game(player, boards, board_level)
-        winsound.PlaySound("sounds/first_map.wav",winsound.SND_ASYNC)
+        if sound_on == [1]:
+            winsound.PlaySound("sounds/first_map.wav",winsound.SND_ASYNC)
+
         while True:
+            if sound_on == [0]:
+               winsound.PlaySound(None,winsound.SND_ASYNC) 
+            elif sound_on == [1] and unmuted == [1]:
+                if board_level[0] == 0:
+                     winsound.PlaySound("sounds/first_map.wav",winsound.SND_ASYNC)
+                elif board_level[0] == 1:
+                     winsound.PlaySound("sounds/second_map.wav",winsound.SND_ASYNC)
+                elif board_level[0] == 2:
+                     winsound.PlaySound("sounds/cave.wav",winsound.SND_ASYNC)
+                elif board_level[0] == 3:
+                     winsound.PlaySound("sounds/boss.wav",winsound.SND_ASYNC)
+                unmuted[0] = 0
+            
             util.clear_screen()
             engine.put_player_on_board(boards[board_level[0]], player, PLAYER_ICON)
             if board_level[0] == 2: 
@@ -89,7 +106,7 @@ def main():
             key = util.key_pressed()
             if key == "`":
                 ui.clear_screen()
-                pause_option = engine.pause_menu(player, boards, board_level)
+                pause_option = engine.pause_menu(player, boards, board_level,sound_on, unmuted)
                 if pause_option == "exit_game":
                     util.clear_screen()
                     if util.get_confirmation("Do you really want to quit the game? (yes/no)"):
@@ -100,7 +117,8 @@ def main():
             elif key == "w" and engine.is_not_wall(boards[board_level[0]], player_location_row-1, player_location_col):
                 if engine.is_unoccupied(boards[board_level[0]],player_location_row-1,player_location_col):
                     player["player_location"][0] -= 1
-                    # winsound.Beep(150,100)
+                    if sound_on == [1]:
+                        winsound.Beep(300,2)
                     engine.move_enemies_randomly(boards[board_level[0]],ENEMY_ICON,player)
                     engine.move_enemies_randomly(boards[board_level[0]],BOSS_ICON,player,True)
                 else:
@@ -114,7 +132,8 @@ def main():
             elif key == "s" and engine.is_not_wall(boards[board_level[0]], player_location_row+1, player_location_col):
                 if engine.is_unoccupied(boards[board_level[0]],player_location_row+1,player_location_col):
                     player["player_location"][0] += 1
-                    # winsound.Beep(150,100)
+                    if sound_on == [1]:
+                        winsound.Beep(300,2)
                     engine.move_enemies_randomly(boards[board_level[0]],ENEMY_ICON,player)
                     engine.move_enemies_randomly(boards[board_level[0]],BOSS_ICON,player,True)
                 else:
@@ -127,8 +146,9 @@ def main():
 
             elif key == "a" and engine.is_not_wall(boards[board_level[0]], player_location_row, player_location_col-1):
                 if engine.is_unoccupied(boards[board_level[0]],player_location_row,player_location_col-1):
-                    player["player_location"][1] -= 1 
-                    # winsound.Beep(150,100)
+                    player["player_location"][1] -= 1
+                    if sound_on == [1]:
+                        winsound.Beep(300,2)
                     engine.move_enemies_randomly(boards[board_level[0]],ENEMY_ICON,player)
                     engine.move_enemies_randomly(boards[board_level[0]],BOSS_ICON,player,True)
                 else:
@@ -142,7 +162,8 @@ def main():
             elif key == "d" and engine.is_not_wall(boards[board_level[0]], player_location_row, player_location_col+1):
                 if engine.is_unoccupied(boards[board_level[0]],player_location_row,player_location_col+1):
                     player["player_location"][1] += 1 
-                    # winsound.Beep(150,100)
+                    if sound_on == [1]:
+                        winsound.Beep(300,2)
                     engine.move_enemies_randomly(boards[board_level[0]],ENEMY_ICON,player)
                     engine.move_enemies_randomly(boards[board_level[0]],BOSS_ICON,player,True)
                 else:
@@ -173,7 +194,8 @@ def main():
                 if board_level[0] == 0:
                     player["player_location"] = engine.player_location_after_door(boards[board_level[0]],player_location_row,player_location_col)
                     board_level[0] = 1
-                    winsound.PlaySound("sounds/second_map.wav",winsound.SND_ASYNC)                 
+                    if sound_on == [1]:
+                        winsound.PlaySound("sounds/second_map.wav",winsound.SND_ASYNC)                 
                 elif board_level[0] == 2:
                     if boards[board_level[0]][player_location_row][player_location_col] == OPEN_EXIT_DOOR_ICON:
                         player["player_location"] = [1,58]
@@ -185,14 +207,15 @@ def main():
                     if boards[board_level[0]][player_location_row][player_location_col] == OPEN_EXIT_DOOR_ICON and not escaped_cave:
                         player["player_location"] = engine.player_location_after_door(boards[board_level[0]],player_location_row,player_location_col)
                         board_level[0] -= 1
-                        if board_level[0] == 0:
+                        if board_level[0] == 0 and sound_on == [1]:
                             winsound.PlaySound("sounds/first_map.wav",winsound.SND_ASYNC) 
-                        if board_level[0] == 1:
+                        if board_level[0] == 1 and sound_on == [1]:
                             winsound.PlaySound("sounds/second_map.wav",winsound.SND_ASYNC)
                     elif board_level[0] == 1 and escaped_cave: #reentering cave
                         player["player_location"] = [30,58]
                         board_level[0] += 1
-                        winsound.PlaySound("sounds/cave.wav",winsound.SND_ASYNC) 
+                        if sound_on == [1]:
+                            winsound.PlaySound("sounds/cave.wav",winsound.SND_ASYNC) 
                     else:
                         if board_level[0] != 1:
                             player["player_location"] = engine.player_location_after_door(boards[board_level[0]],player_location_row,player_location_col)
@@ -200,7 +223,8 @@ def main():
                             player["player_location"] = [15,58]
                             if not escaped_cave:
                                 util.clear_screen()
-                                winsound.PlaySound("sounds/cave.wav",winsound.SND_ASYNC)
+                                if  sound_on == [1]:
+                                    winsound.PlaySound("sounds/cave.wav",winsound.SND_ASYNC)
                                 ui.display_message("You have fallen into the cave".center(119),3,0)
                                 util.press_any_button(2,0,True)
                                 escaped_cave = True

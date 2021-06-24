@@ -92,25 +92,37 @@ def load_game(player, boards, board_level):
         util.press_any_button(2,0,True)
         util.clear_screen()
 
-def create_pause_menu():
+def create_pause_menu(sound_one):
     options = ["Exit Game",
                "Resume Game",
                "Save Game",
                "Load Game",
                "Main Menu"]
+    if sound_one == [1]:
+        options.insert(4,"Mute Sound")
+    else:
+        options.insert(4,"Unmute Sound")
     ui.display_menu("Game paused", options)
 
-def pause_menu(player, boards, board_level):
+def pause_menu(player, boards, board_level, sound_on,unmuted):
     while True:
-        create_pause_menu()
+        create_pause_menu(sound_on)
         try:
             option = int(util.get_input("Select option".rjust(130//2),1,0))
             if option == 0:
                 return "exit_game"
             elif option == 1:
                 return
-            elif option == 4:
+            elif option == 5:
                 return "back_to_menu"
+            elif option == 4:
+                if sound_on == [1]:
+                    sound_on[0] = 0
+                    unmuted[0] = 0
+                else:
+                    sound_on[0] = 1
+                    unmuted[0] = 1
+                return
             elif option == 2:
                 return save_game(player, boards, board_level)
             elif option == 3:
