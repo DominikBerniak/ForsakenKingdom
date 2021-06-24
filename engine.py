@@ -77,7 +77,7 @@ def save_game(player, boards, board_level):
     with open("saved_games.py","w",encoding="utf-8") as save_file:
         save_file.write(f"player = {player}\nboards = {boards}\nboard_level = {board_level[0]}")
     # with open("boards.py","a",encoding="utf-8") as save_file:
-    #     save_file.write(f"\nlevel_2 = {boards[board_level[0]]}")
+    #     save_file.write(f"\nlevel_3 = {boards[board_level[0]]}")
 
 def load_game(player, boards, board_level):
     try:
@@ -130,12 +130,12 @@ def pause_menu(player, boards, board_level):
             util.clear_screen()
 
 def is_unoccupied(board,row,col):
-    # return board[row][col] == " " or board[row][col] == "O"
-    return True
+    return board[row][col] == " " or board[row][col] == "O"
+    # return True
 
 def is_not_wall(board, row, col):
-    # return (board[row][col] != "=" and board[row][col] != "|")
-    return True
+    return (board[row][col] != "=" and board[row][col] != "|")
+    # return True
 
 def get_player_placement(board, player_icon):
     for i in range(len(board)):
@@ -145,9 +145,9 @@ def get_player_placement(board, player_icon):
 
 def put_player_on_board(board, player,player_icon):
     ########zakomentować, żeby rysować######
-    # cords = get_player_placement(board, player_icon)
-    # if cords:
-    #     board[cords[0]][cords[1]] = " "
+    cords = get_player_placement(board, player_icon)
+    if cords:
+        board[cords[0]][cords[1]] = " "
     #######################################
     player_row, player_col, player_icon = player["player_location"][0],player["player_location"][1], player["player_icon"]
     board[player_row][player_col] = player_icon
@@ -174,18 +174,30 @@ def get_next_level_old_door_location(board,row,col):
         col = 0
     return [row,col]
 
-def put_door_on_board(board,door_icon):
-    for i in range(len(board)):
-        enter_door_row = random.randint(0, len(board[i])-1)
-        if enter_door_row in [0, len(board[i])-1]:
-            enter_door_col = random.choice([1,len(board[i][0])-2])
+def put_door_on_board(boards,door_icon):
+    for i in range(len(boards)):
+        if i != 2:
+            enter_door_row = random.randint(0, len(boards[i])-1)
+            if enter_door_row in [0, len(boards[i])-1]:
+                enter_door_col = random.choice([1,len(boards[i][0])-2])
+            else:
+                enter_door_col = random.choice([0, len(boards[i][0])-1])
+            if i < len(boards)-1 and i!=1:
+                boards[i][enter_door_row][enter_door_col] = door_icon
+            elif i == 1:
+                enter_door_row = 0
+                enter_door_col = 58
+                boards[1][0][58] = door_icon
+            exit_door_row, exit_door_col = get_next_level_old_door_location(boards[0], enter_door_row, enter_door_col)
+            if i < len(boards)-1 and i == 0:
+                boards[i+1][exit_door_row][exit_door_col] = "O" #open door
         else:
-            enter_door_col = random.choice([0, len(board[i][0])-1])
-        if i < len(board)-1:
-            board[i][enter_door_row][enter_door_col] = door_icon
-        exit_door_row, exit_door_col = get_next_level_old_door_location(board[0], enter_door_row, enter_door_col)
-        if i < len(board)-1:
-            board[i+1][exit_door_row][exit_door_col] = "O" #open door
+            enter_door_row = 0
+            enter_door_col = 58
+            boards[2][enter_door_row][enter_door_col] = door_icon
+            exit_door_row = 31
+            exit_door_col = 58
+            boards[2][exit_door_row][exit_door_col] = "O"
 
 def find_the_door(board):
     for row in range(len(board)):
@@ -221,14 +233,10 @@ def is_next_to_player(enemy_row,enemy_col,player):
     return False
 
 
-def put_npc_quest_on_board(board,board_level,npc_quest_icon):
-    if board_level == 0:
-        npc_row = 6
-        npc_col = 38
-    elif board_level == 1:
-        npc_row = 12
-        npc_col = 21
-    board[board_level][npc_row][npc_col] = npc_quest_icon
+def put_npc_quest_on_board(boards,npc_quest_icon):
+    boards[0][6][38] = npc_quest_icon
+    boards[1][12][21] = npc_quest_icon
+    boards[2][26][105] = npc_quest_icon
 
 def put_npc_shop_on_board(board,npc_shop_icon):
     for i in range(len(board)):
@@ -249,12 +257,15 @@ def put_item_on_board(board,item_icon):
                 item_col = random.randint(1, len(board[i][0])-2)
                 x-=1
             board[i][item_row][item_col] = item_icon
-def put_treasure_on_board(boards,board_level,treasure_icon):
-    if board_level == 0:
-        boards[board_level][7][69] = treasure_icon
-    elif board_level == 1:
-        boards[board_level][11][32] = treasure_icon
-        boards[board_level][20][23] = treasure_icon
+def put_treasure_on_board(boards,treasure_icon):
+    boards[0][7][69] = treasure_icon
+
+    boards[1][11][32] = treasure_icon
+    boards[1][20][23] = treasure_icon
+
+    boards[2][30][4] = treasure_icon
+    boards[2][14][106] = treasure_icon
+    boards[2][8][84] = treasure_icon
 
 def put_enemy_on_board(board,enemy_icon):
     for i in range(len(board)):
@@ -745,7 +756,7 @@ def add_random_item_to_inventory(player, is_treasure=False):
     if not is_treasure:
         random_item = create_item()
     else:
-        rendom_item = {"type": "Gold", "name": "Gold", "value": 20}
+        random_item = {"type": "Gold", "name": "Gold", "value": 20}
     if random_item["type"] == "Gold":
         added_gold = False
         for i in range(len(player["inventory"])):

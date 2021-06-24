@@ -3,7 +3,7 @@ import engine
 import ui
 from time import sleep
 import winsound
-from boards import level_1, level_2
+from boards import level_1, level_2, level_3
 
 PLAYER_ICON = '@'
 CLOSED_DOOR_ICON = 'X'
@@ -12,15 +12,11 @@ NPC_SHOP_ICON = '$'
 NPC_QUEST_ICON = "?"
 ENEMY_ICON = 'T'
 ITEM_ICON = '&'
-TREASURE_ICON = "+"
+TREASURE_ICON = "%"
 BOSS_ICON = 'B'
 
 PLAYER_START_ROW = 30
-PLAYER_START_COL = 57
-
-# PLAYER_ICON = '='
-# PLAYER_START_ROW = 5
-# PLAYER_START_COL = 10
+PLAYER_START_COL = 58
 
 BOARD_WIDTH = 115
 BOARD_HEIGHT = 30
@@ -47,12 +43,13 @@ def main():
         if option == "start_game":
             util.clear_screen()
             player = engine.create_player(PLAYER_START_ROW,PLAYER_START_COL,PLAYER_ICON)
-        boards = [level_1 ,level_2,engine.create_board(BOARD_WIDTH, BOARD_HEIGHT)]
+        boards = [level_1 ,level_2,level_3,engine.create_board(BOARD_WIDTH, BOARD_HEIGHT)]
         board_level = [2]
+        escaped_cave = False
         engine.put_door_on_board(boards,CLOSED_DOOR_ICON)
         engine.put_npc_shop_on_board(boards,NPC_SHOP_ICON)
-        engine.put_npc_quest_on_board(boards,board_level[0],NPC_QUEST_ICON)
-        engine.put_treasure_on_board(boards,board_level[0],TREASURE_ICON)
+        engine.put_npc_quest_on_board(boards,NPC_QUEST_ICON)
+        engine.put_treasure_on_board(boards,TREASURE_ICON)
         engine.put_enemy_on_board(boards,ENEMY_ICON)
         engine.put_item_on_board(boards,ITEM_ICON)
         engine.get_boss_location(boards[0],BOSS_ICON)
@@ -143,13 +140,31 @@ def main():
             if player_location_row in board_walls["rows"] or player_location_col in board_walls["cols"]:
                 if board_level[0] == 0:
                     player["player_location"] = engine.player_location_after_door(boards[board_level[0]],player_location_row,player_location_col)
-                    board_level[0] = 1
-                else:
+                    board_level[0] = 1                    
+                elif board_level[0] == 2:
                     if boards[board_level[0]][player_location_row][player_location_col] == OPEN_EXIT_DOOR_ICON:
+                        player["player_location"] = [1,58]
+                        board_level[0] = 1
+                    else:
+                        player["player_location"] = [28,3]
+                        board_level = 3
+                else:
+                    if boards[board_level[0]][player_location_row][player_location_col] == OPEN_EXIT_DOOR_ICON and not escaped_cave:
                         player["player_location"] = engine.player_location_after_door(boards[board_level[0]],player_location_row,player_location_col)
                         board_level[0] -= 1
+                    elif board_level[0] == 1 and escaped_cave:
+                        player["player_location"] = [30,58]
+                        board_level[0] += 1
                     else:
-                        player["player_location"] = engine.player_location_after_door(boards[board_level[0]],player_location_row,player_location_col)
+                        if board_level[0] != 1:
+                            player["player_location"] = engine.player_location_after_door(boards[board_level[0]],player_location_row,player_location_col)
+                        else: #entering cave
+                            player["player_location"] = [15,58]
+                            if not escaped_cave:
+                                util.clear_screen()
+                                ui.display_message("You have fallen into the cave".center(119),3,0)
+                                util.press_any_button(2,0,True)
+                                escaped_cave = True
                         board_level[0] += 1
             
     elif option == "quit":
