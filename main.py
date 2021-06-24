@@ -76,6 +76,7 @@ def main():
                 if engine.is_unoccupied(boards[board_level[0]],player_location_row-1,player_location_col):
                     player["player_location"][0] -= 1
                     # winsound.Beep(150,100)
+                    engine.move_enemies_randomly(boards[board_level[0]],ENEMY_ICON,player)
                 else:
                     player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row-1,player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON)
                     player["player_location"][0] -= player_encounter[0]
@@ -86,6 +87,7 @@ def main():
                 if engine.is_unoccupied(boards[board_level[0]],player_location_row+1,player_location_col):
                     player["player_location"][0] += 1
                     # winsound.Beep(150,100)
+                    engine.move_enemies_randomly(boards[board_level[0]],ENEMY_ICON,player)
                 else:
                     player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row+1, player_location_col,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON)
                     player["player_location"][0] += player_encounter[0]
@@ -96,6 +98,7 @@ def main():
                 if engine.is_unoccupied(boards[board_level[0]],player_location_row,player_location_col-1):
                     player["player_location"][1] -= 1 
                     # winsound.Beep(150,100)
+                    engine.move_enemies_randomly(boards[board_level[0]],ENEMY_ICON,player)
                 else:
                     player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row,player_location_col-1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON) 
                     player["player_location"][1] -= player_encounter[0]
@@ -106,6 +109,7 @@ def main():
                 if engine.is_unoccupied(boards[board_level[0]],player_location_row,player_location_col+1):
                     player["player_location"][1] += 1 
                     # winsound.Beep(150,100)
+                    engine.move_enemies_randomly(boards[board_level[0]],ENEMY_ICON,player)
                 else:
                     player_encounter = engine.encounter(boards[board_level[0]], player,player_location_row,player_location_col+1,NPC_QUEST_ICON,NPC_SHOP_ICON,ENEMY_ICON,ITEM_ICON,board_level[0],CLOSED_DOOR_ICON) 
                     player["player_location"][1] += player_encounter[0]

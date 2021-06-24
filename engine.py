@@ -203,9 +203,6 @@ def open_the_door(board,player):
     else:
         ui.display_message("Not have a key!!! Go find it!!")
         util.press_any_button()
-<<<<<<< HEAD
-=======
-        ui.display_board(board)
         
 def is_next_to_player(enemy_row,enemy_col,player):
     player_row, player_col = player["player_location"]
@@ -219,7 +216,6 @@ def is_next_to_player(enemy_row,enemy_col,player):
         return True
     return False
 
->>>>>>> 634194c39f6de3333343fd4b5e3643b1de1de7f6
 
 def put_npc_quest_on_board(board,npc_quest_icon):
     for i in range(len(board)):
