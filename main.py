@@ -13,6 +13,7 @@ NPC_QUEST_ICON = "?"
 ENEMY_ICON = 'T'
 ITEM_ICON = '&'
 TREASURE_ICON = "+"
+BOSS_ICON = 'B'
 
 PLAYER_START_ROW = 30
 PLAYER_START_COL = 57
@@ -54,6 +55,7 @@ def main():
         engine.put_treasure_on_board(boards,board_level[0],TREASURE_ICON)
         engine.put_enemy_on_board(boards,ENEMY_ICON)
         engine.put_item_on_board(boards,ITEM_ICON)
+        engine.get_boss_location(boards[0],BOSS_ICON)
 
         if option == "load_game":
             player = {}
@@ -61,7 +63,10 @@ def main():
         while True:
             util.clear_screen()
             engine.put_player_on_board(boards[board_level[0]], player, PLAYER_ICON)
-            ui.display_board(boards[board_level[0]])
+            if board_level[0] == 2: 
+                ui.display_dark_board(boards[board_level[0]],player)
+            else:
+                ui.display_board(boards[board_level[0]])
             ui.display_stats(player,boards[board_level[0]],2)
             player_location_row, player_location_col = player["player_location"]
 
