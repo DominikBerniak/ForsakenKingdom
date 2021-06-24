@@ -271,16 +271,34 @@ def instruction():
     util.press_any_button(2)
     util.clear_screen()
 
-def hall_of_fame():
+def hall_of_fame(player_level, mode, current_exp, player_name):
     ui.clear_screen()
-    ui.display_message("Not implemented yet!",2)
-    util.press_any_button(2)
+    if mode == "result":
+        try:
+            HOF_scores = open(r"hall_of_fame.txt", "a+")
+            HOF_scores.write(f"{player_name}|{100 * player_level + current_exp}\n")
+        except:
+            print("Program encountered critical error! (error type: missing file)")
+    if mode == "scoreboard":
+        scoreboard = []
+        try:
+            HOF_scores = open(r"hall_of_fame.txt", "r")
+        except:
+            HOF_scores = open(r"hall_of_fame.txt", "a+")
+        for line in HOF_scores.readlines():
+            line = line.split("|")
+            line[1] = int(line[1])
+            scoreboard.append(line)
+        sorted_score = sorted(scoreboard, key=lambda x: x[1])[:10]
+        for count,score in enumerate(sorted_score, start=1):
+            print(count, *score)
+    util.press_any_button(new_lines=0, indent=4)
     util.clear_screen()
 
 def create_menu():
     options = ["Exit game", 
                "New Game",
-               "Hall of Fame",  # optional
+               "Hall of Fame",
                "Authors",
                "Instruction"]
     ui.display_menu("Main menu", options)
@@ -290,7 +308,7 @@ def load_module(option):
         #start_game()
         return "start_game"
     elif option == 2:
-        hall_of_fame()
+        hall_of_fame(0,"scoreboard", 0, "none")
     elif option == 3:
         authors()
     elif option == 4:
