@@ -1,3 +1,4 @@
+from main import BOSS_ICON,BODY_BOSS_ICON
 from util import clear_screen
 import engine
 
@@ -41,20 +42,23 @@ def display_dark_board(board,player):
         print()
 
 def display_boss_board(board):
-    boss_range = 1
-    boss_location = engine.get_boss_location(board)
+    boss_range = 3
+    boss_location = engine.get_boss_location(board,BOSS_ICON)
+    boss_design = [BODY_BOSS_ICON] * 6 +["O"," ","O"]+[BODY_BOSS_ICON] * 2+[" ",BOSS_ICON," ",]+[BODY_BOSS_ICON] * 2+["V"]*3+[BODY_BOSS_ICON] * 6
+    index_of_boss_design = 0
     print("\n")
-    for i in range(len(board)):
-        for j in range(len(board[0])):
-            if j == boss_location[1]-boss_range and j == boss_location["boss_location"][1]+ boss_range and i == boss_location["boss_location"][0] - boss_range and i == boss_location["boss_location"][0] + boss_range:
-                print("*",end="")
-            elif j > boss_location[1]-boss_range and j <boss_location["boss_location"][1]+ boss_range and i > boss_location["boss_location"][0] - boss_range and i < boss_location["boss_location"][0] + boss_range:
-                print(".",end="")
-            else:
+    if boss_location[0]:
+        for i in range(len(board)):
+            for j in range(len(board[0])):
+                if j > boss_location[1] - boss_range and j < boss_location[1]+ boss_range and i > boss_location[0] - boss_range and i < boss_location[0] + boss_range:
+                    # print(boss_design[index_of_boss_design],end="")
+                    board[i][j] = boss_design[index_of_boss_design]
+                    index_of_boss_design += 1
+                else:
+                    if board[i][j] == BODY_BOSS_ICON:
+                        board[i][j] =" "                  
                 print(board[i][j],end="")
-        print()
-
-
+            print()
 
 def display_equipment(player):
     display_title("Your Equipment",4)

@@ -206,13 +206,14 @@ def find_the_door(board):
                 return row,col
 
 def delete_key_from_inventory(inventory):
-    for index in range(len(inventory)):
-        if inventory[index]["name"] == "Key":
+    print(len(inventory),inventory)
+    for index in range(len(inventory)-1):
+        if inventory[index]["type"] == "Key":
             del inventory[index]
 
 def open_the_door(board,player):
     enter_door_row,enter_door_col = find_the_door(board)
-    if have_key_in_inventory(player["inventory"]) != False:
+    if have_key_in_inventory(player["inventory"]):
         util.clear_screen()
         board[enter_door_row][enter_door_col] =" "
         delete_key_from_inventory(player["inventory"])
@@ -231,7 +232,6 @@ def is_next_to_player(enemy_row,enemy_col,player):
     elif enemy_row == player_row and enemy_col - 1 == player_col:
         return True
     return False
-
 
 def put_npc_quest_on_board(boards,npc_quest_icon):
     boards[0][6][38] = npc_quest_icon
@@ -278,6 +278,11 @@ def put_enemy_on_board(board,enemy_icon):
                 enemy_col = random.randint(1, len(board[i][0])-2)
             board[i][enemy_row][enemy_col] = enemy_icon
             number_of_enemies -= 1
+
+def put_boss_on_board(board,boss_icon):
+    enemy_row = 20
+    enemy_col = 20
+    board[enemy_row][enemy_col] = boss_icon
 
 def random_item_name(type,type_description):
     item = random.choice(type)
@@ -504,11 +509,9 @@ def create_adalbert():
     return adalbert
 
 def have_key_in_inventory(inventory):
-    index =0
-    for item in inventory:
-        if item["type"] == "Key":
-            return index
-        index += 1
+    for index in range(len(inventory)):
+        if inventory[index]["type"] == "Key":
+            return True
     return False
 
 def do_quest(player,board_lvl):
@@ -555,12 +558,12 @@ def update_gold_in_inventory(inventory,amount_of_gold):
 
 def create_boss():
     boss = {
-        "adjective":"Godness",
+        "adjective":"",
         "name":"Yoshi, the Dog",
-        "health":[200],
+        "health":200,
         "attack":35,
         "armor":20,
-        "icon":"B"
+        "exp":0
     }
     return boss
 
@@ -687,7 +690,6 @@ def choose_item_to_wear(filtred_inventory,player,number_of_part_equipment):
             util.press_any_button(4,0,True)
             return player["equipment"][number_of_part_equipment]
         
-
 def wear_equipment(player):
     while True:
         util.clear_screen()
@@ -769,8 +771,11 @@ def add_random_item_to_inventory(player, is_treasure=False):
         player["inventory"].append(random_item)
     return random_item
 
-def fight_enemy(player,board):
-    enemy = create_enemy(player)
+def fight_enemy(player,board,is_boss=False):
+    if is_boss:
+        enemy = create_boss()
+    else:
+        enemy = create_enemy(player)
     enemy_turn = "Enemy"
     player_turn = "Player"
     turn = random.choice([enemy_turn,player_turn])
@@ -846,7 +851,7 @@ def fight_enemy(player,board):
 def interaction_with_traders(player,board_level):
     shop_level_1 = create_npc("Dominic Passivniac",10,8) # panowie sory musiałem XD
     shop_level_2 = create_npc("Kevin Gregorish",10,8)
-    shop_level_3 = create_npc("David Chickoe",10,8)
+    shop_level_3 = create_npc("Jacob Hamer",10,8)
     npcs = [shop_level_1,shop_level_2,shop_level_3]
     while True:
         ui.clear_screen()
@@ -861,14 +866,14 @@ def interaction_with_traders(player,board_level):
             util.press_any_button(1,0,True)
             break
 
-
 def get_boss_location(board,boss_icon):
     for row in range(len(board)):
         for col in range(len(board[0])):
             if board[row][col] == boss_icon:
                 return [row,col]
+    return [20,20]
 
-def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_icon,item_icon,board_level,door_icon,treasure_icon):
+def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_icon,item_icon,board_level,door_icon,treasure_icon,boss_icon):
     if board[player_row][player_col] == quest_icon:
         do_quest(player,board_level)
         return [0]
@@ -879,6 +884,12 @@ def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_i
         result = fight_enemy(player,board)
         if result == "victory":
             return [1]
+        elif result == "defeat":
+            return [0,"defeat"]
+    elif board[player_row][player_col] == boss_icon:
+        result = fight_enemy(player,board,True)
+        if result == "victory":
+            return [0,"final_victory"]
         elif result == "defeat":
             return [0,"defeat"]
     elif board[player_row][player_col] == door_icon:
@@ -898,7 +909,12 @@ def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_i
         add_random_item_to_inventory(player,is_treasure=True)
         return [1]
 
-def move_enemies_randomly(board,enemy_icon,player):
+def move_enemies_randomly(board,enemy_icon,player,is_boss = False):
+    if is_boss:
+        range_of_enemy = 3
+    else:
+        range_of_enemy = 0
+
     enemy_cords = []
     for x in range(len(board)):
         for y in range(len(board[0])):
@@ -909,21 +925,21 @@ def move_enemies_randomly(board,enemy_icon,player):
     while i < len(enemy_cords):
         enemy_current_row = enemy_cords[i][0]
         enemy_current_col = enemy_cords[i][1]
-        if is_next_to_player(enemy_current_row,enemy_current_col,player):
+        if is_next_to_player(enemy_current_row+range_of_enemy,enemy_current_col+range_of_enemy,player):
             board[enemy_current_row][enemy_current_col] = " "
-            return fight_enemy(player,board)
+            if is_boss:
+                return fight_enemy(player,board,True)
+            else:
+                return fight_enemy(player,board)
         
         random_row_move = random.choice([-1,0,0,0,0,0,1])
         if random_row_move in [-1,1]:
             random_col_move = 0
         else:
             random_col_move = random.choice([-1,0,0,0,0,0,1])
-        if is_unoccupied(board,enemy_current_row+random_row_move,enemy_current_col+random_col_move):
+        if is_unoccupied(board,enemy_current_row+random_row_move+range_of_enemy,enemy_current_col+random_col_move+range_of_enemy):
             board[enemy_current_row][enemy_current_col] = " "
             board[enemy_current_row+random_row_move][enemy_current_col+random_col_move] = enemy_icon
             i+=1
         else:
             i+=1
-            
-
-    
