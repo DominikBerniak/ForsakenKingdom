@@ -175,29 +175,55 @@ def get_next_level_old_door_location(board,row,col):
     return [row,col]
 
 def put_door_on_board(boards,door_icon):
+    # for i in range(len(boards)):
+    #     if i != 2:
+    #         enter_door_row = random.randint(0, len(boards[i])-1)
+    #         if enter_door_row in [0, len(boards[i])-1]:
+    #             enter_door_col = random.choice([1,len(boards[i][0])-2])
+    #         else:
+    #             enter_door_col = random.choice([0, len(boards[i][0])-1])
+
+
+    #         if i < len(boards)-1 and i!=1:
+    #             boards[i][enter_door_row][enter_door_col] = door_icon
+    #         elif i == 1:
+    #             enter_door_row = 0
+    #             enter_door_col = 58
+    #             boards[1][0][58] = door_icon
+    #         exit_door_row, exit_door_col = get_next_level_old_door_location(boards[0], enter_door_row, enter_door_col)
+    #         if i < len(boards)-1 and i == 0:
+    #             boards[i+1][exit_door_row][exit_door_col] = "O" #open door
+    #     else:
+    #         enter_door_row = 0
+    #         enter_door_col = 58
+    #         boards[2][enter_door_row][enter_door_col] = door_icon
+    #         exit_door_row = 31
+    #         exit_door_col = 58
+    #         boards[2][exit_door_row][exit_door_col] = "O"
+
+    enter_door_row = random.randint(0, len(boards[0])-1)
+    if enter_door_row in [0, len(boards[0])-1]:
+        enter_door_col = random.choice([1,len(boards[0][0])-2])
+    else:
+        enter_door_col = random.choice([0, len(boards[0][0])-1])
+
     for i in range(len(boards)):
-        if i != 2:
-            enter_door_row = random.randint(0, len(boards[i])-1)
-            if enter_door_row in [0, len(boards[i])-1]:
-                enter_door_col = random.choice([1,len(boards[i][0])-2])
-            else:
-                enter_door_col = random.choice([0, len(boards[i][0])-1])
-            if i < len(boards)-1 and i!=1:
-                boards[i][enter_door_row][enter_door_col] = door_icon
-            elif i == 1:
-                enter_door_row = 0
-                enter_door_col = 58
-                boards[1][0][58] = door_icon
+        if i == 0:
+            boards[0][enter_door_row][enter_door_col] = door_icon
+        elif i == 1:
+            boards[1][0][58] = door_icon
             exit_door_row, exit_door_col = get_next_level_old_door_location(boards[0], enter_door_row, enter_door_col)
-            if i < len(boards)-1 and i == 0:
-                boards[i+1][exit_door_row][exit_door_col] = "O" #open door
-        else:
+            boards[1][exit_door_row][exit_door_col] = "O" #open door
+        elif i == 2:
             enter_door_row = 0
             enter_door_col = 58
             boards[2][enter_door_row][enter_door_col] = door_icon
             exit_door_row = 31
             exit_door_col = 58
             boards[2][exit_door_row][exit_door_col] = "O"
+        else:
+            pass
+
 
 def find_the_door(board):
     for row in range(len(board)):
@@ -206,7 +232,6 @@ def find_the_door(board):
                 return row,col
 
 def delete_key_from_inventory(inventory):
-    print(len(inventory),inventory)
     for index in range(len(inventory)-1):
         if inventory[index]["type"] == "Key":
             del inventory[index]
@@ -214,12 +239,12 @@ def delete_key_from_inventory(inventory):
 def open_the_door(board,player):
     enter_door_row,enter_door_col = find_the_door(board)
     if have_key_in_inventory(player["inventory"]):
-        util.clear_screen()
         board[enter_door_row][enter_door_col] =" "
         delete_key_from_inventory(player["inventory"])
     else:
-        ui.display_message("Not have a key!!! Go find it!!")
-        util.press_any_button()
+        util.clear_screen()
+        ui.display_message("You do not have a key. Maybe someone can help you...".center(119),3,0)
+        util.press_any_button(2,0,True)
         
 def is_next_to_player(enemy_row,enemy_col,player):
     player_row, player_col = player["player_location"]
@@ -792,7 +817,7 @@ def fight_enemy(player,board,is_boss=False):
         #enemy turn
         if turn == enemy_turn:
             ui.display_message(f"It's {turn.lower()}'s turn to attack".center(len(board[0])),2,0)
-            sleep(1.5)
+            sleep(1)
             enemy_max_damage = (enemy["attack"] - player["armor"])
             if enemy_max_damage > 0:
                 enemy_damage = random.randint(1,enemy_max_damage)
@@ -906,6 +931,9 @@ def encounter(board, player, player_row, player_col,quest_icon,shop_icon,enemy_i
         util.clear_screen()
         return [1]
     elif board[player_row][player_col] == treasure_icon:
+        util.clear_screen()
+        ui.display_message(f"You have found a treasure. You have picked up 20 gold.".center(119),3,0)
+        util.press_any_button(1,0,True)
         add_random_item_to_inventory(player,is_treasure=True)
         return [1]
 
