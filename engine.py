@@ -91,28 +91,30 @@ def load_game(player, boards, board_level):
         util.clear_screen()
 
 def create_pause_menu():
-    options = ["Exit game",
-               "Resume game",
-               "Save game",
-               "Load game",
-               "Go back to main menu"]
+    options = ["Exit Game",
+               "Resume Game",
+               "Save Game",
+               "Load Game",
+               "Main Menu"]
     ui.display_menu("Game paused", options)
 
 def pause_menu(player, boards, board_level):
     while True:
         create_pause_menu()
         try:
-            option = util.get_input("Select option".rjust(130//2),1,0)
-            if option == "0":
+            option = int(util.get_input("Select option".rjust(130//2),1,0))
+            if option == 0:
                 return "exit_game"
-            elif option == "1":
+            elif option == 1:
                 return
-            elif option == "4":
+            elif option == 4:
                 return "back_to_menu"
-            elif option == "2":
+            elif option == 2:
                 return save_game(player, boards, board_level)
-            elif option == "3":
+            elif option == 3:
                 return load_game(player, boards, board_level)
+            else:
+                raise KeyError
         except KeyError:
             util.clear_screen()
             ui.display_error_message("There is no such option!".center(119),3,0)
@@ -138,9 +140,11 @@ def get_player_placement(board, player_icon):
                 return i,j
 
 def put_player_on_board(board, player,player_icon):
+    ########zakomentować, żeby rysować######
     cords = get_player_placement(board, player_icon)
     if cords:
         board[cords[0]][cords[1]] = " "
+    #######################################
     player_row, player_col, player_icon = player["player_location"][0],player["player_location"][1], player["player_icon"]
     board[player_row][player_col] = player_icon
 
@@ -337,20 +341,22 @@ def hall_of_fame():
 def create_menu():
     options = ["Exit game", 
                "New Game",
-               "Hall of Fame",  # optional
+               "Load Game",
+               "Hall of Fame",
                "Authors",
                "Instruction"]
     ui.display_menu("Main menu", options)
 
 def load_module(option):
     if option == 1:
-        #start_game()
         return "start_game"
     elif option == 2:
-        hall_of_fame()
+        return "load_game"
     elif option == 3:
-        authors()
+        hall_of_fame()
     elif option == 4:
+        authors()
+    elif option == 5:
         instruction()
     elif option == 0:
         return "quit"
@@ -362,9 +368,8 @@ def menu():
         create_menu()
         try:
             option = util.get_input("Select option".rjust(130//2),1,0)
-            # load_module(int(option))
             option = load_module(int(option))
-            if option == "start_game" or option == "quit":
+            if option == "start_game" or option == "quit" or option == "load_game":
                 return option
 
         except KeyError:
