@@ -118,19 +118,35 @@ def display_menu(title, list_options):
 
 def display_race_choices(races):
     clear_screen()
-    longest_race = 0
+    longest_race = len(races[0]["race"])
+    longest_value = len(str(races[0]["health"]))
     for i in range(len(races)):
         if len(races[i]["race"]) > longest_race:
             longest_race = len(races[i]["race"])
-    print("\n\n    Choose your characters race:")
+        if len(str(races[i]["health"])) > longest_value:
+            longest_value = len(str(races[i]["health"]))
+        if len(str(races[i]["attack"])) > longest_value:
+            longest_value = len(str(races[i]["attack"]))
+        if len(str(races[i]["armor"])) > longest_value:
+            longest_value = len(str(races[i]["armor"]))
+    
+    display_title("Choose your characters race:".center(119),4,0)
+    print("\n\n")
     for i in range(len(races)):
         race_length = len(races[i]["race"])
-        filler = " "*(longest_race-race_length+4)
-        print(f'\n\n      {(race_length+1)*" "}{filler}Health  =  {races[i]["health"]}')
-        print(f'      {races[i]["race"]}:{filler}Attack  =  {races[i]["attack"]}')
-        print(f'      {(race_length+1)*" "}{filler}Armor   =  {races[i]["armor"]}')
+        filler_race = (longest_race-race_length) * " "
+        health_lenght = len(str(races[i]["health"]))
+        attack_lenght = len(str(races[i]["attack"]))
+        armor_lenght = len(str(races[i]["armor"]))
+        filler_health = (longest_value-health_lenght) * " " 
+        filler_attack = (longest_value-attack_lenght) * " "
+        filler_armor = (longest_value-armor_lenght) * " "
+        print(f'{longest_race*" "}   Health  =  {races[i]["health"]}{filler_health}'.center(119))
+        print(f'{races[i]["race"]}{filler_race} : Attack  =  {races[i]["attack"]}{filler_attack}'.center(119))
+        print(f'{longest_race*" "}   Armor   =  {races[i]["armor"]}{filler_armor}'.center(119))
         if i < len(races)-1:
-            print("\n    ============================")
+            display_message("============================".center(119),1,0)
+            print()
             
 def display_inventory(inventory, lable = "Inventory:\n",header = None):
     # inventory = [{'type': str, 'name': str, 'value': int}, ...]
@@ -177,6 +193,21 @@ def display_inventory(inventory, lable = "Inventory:\n",header = None):
 
 
 """ASCI ART"""
+
+def display_menu_art():
+    art = """  _____                               _                       _  __  _                       _                     
+ |  ___|  ___    _ __   ___    __ _  | | __   ___   _ __     | |/ / (_)  _ __     __ _    __| |   ___    _ __ ___  
+ | |_    / _ \  | '__| / __|  / _` | | |/ /  / _ \ | '_ \    | ' /  | | | '_ \   / _` |  / _` |  / _ \  | '_ ` _ \ 
+ |  _|  | (_) | | |    \__ \ | (_| | |   <  |  __/ | | | |   | . \  | | | | | | | (_| | | (_| | | (_) | | | | | | |
+ |_|     \___/  |_|    |___/  \__,_| |_|\_\  \___| |_| |_|   |_|\_\ |_| |_| |_|  \__, |  \__,_|  \___/  |_| |_| |_|
+                                                                                 |___/                             """
+    print("\n\n\n")
+    art = art.split("\n")
+    longest_row_length = len(max(art))
+    for i in range(len(art)):
+        row_lenght = len(art[i])
+        filler = (longest_row_length - row_lenght) * " "
+        print(f"{art[i]}{filler}".center(119))
 
 def display_fight_art(board):
     art = """   |\                     /)
