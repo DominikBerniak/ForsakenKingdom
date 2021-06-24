@@ -232,7 +232,6 @@ def find_the_door(board):
 
 def delete_key_from_inventory(inventory):
     for index in range(len(inventory)):
-        util.press_any_button()
         if inventory[index]["type"] == "Key":
             break
     del inventory[index]       
