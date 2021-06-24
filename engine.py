@@ -208,7 +208,6 @@ def put_door_on_board(boards,door_icon):
         else:
             pass
 
-
 def find_the_door(board):
     for row in range(len(board)):
         for col in range(len(board[0])):
@@ -216,9 +215,11 @@ def find_the_door(board):
                 return row,col
 
 def delete_key_from_inventory(inventory):
-    for index in range(len(inventory)-1):
+    for index in range(len(inventory)):
+        util.press_any_button()
         if inventory[index]["type"] == "Key":
-            del inventory[index]
+            break
+    del inventory[index]       
 
 def open_the_door(board,player):
     enter_door_row,enter_door_col = find_the_door(board)
@@ -567,7 +568,7 @@ def update_gold_in_inventory(inventory,amount_of_gold):
 
 def create_boss():
     boss = {
-        "adjective":"Demonic",
+        "adjective":"Demon",
         "name":"Yoshi",
         "health":200,
         "attack":35,
@@ -577,12 +578,12 @@ def create_boss():
     return boss
 
 def create_enemy(player):
-    skeleton = {"adjective": "","name":"Skeleton","health":[5,50],"attack": 10,"armor":5, "exp": 10}
-    ghoul = {"adjective": "","name":"Ghoul","health":[15,50],"attack": 20,"armor":0, "exp": 15}
-    boar = {"adjective": "","name":"Boar","health":[50,200],"attack": 10,"armor":2, "exp": 25}
-    spider = {"adjective": "","name":"Spider","health":[10,50],"attack": 15,"armor":0, "exp": 15}
-    ghost = {"adjective": "","name":"Ghost","health":[1,5],"attack": 7,"armor":0, "exp": 5}
-    ogre = {"adjective": "","name":"Ogre","health":[20,75],"attack": 25,"armor":10, "exp": 75}
+    skeleton = {"adjective": "","name":"Skeleton","health":[5,20],"attack": 10,"armor":5, "exp": 10}
+    ghoul = {"adjective": "","name":"Ghoul","health":[15,30],"attack": 20,"armor":0, "exp": 15}
+    boar = {"adjective": "","name":"Boar","health":[10,30],"attack": 10,"armor":2, "exp": 25}
+    spider = {"adjective": "","name":"Spider","health":[3,17],"attack": 15,"armor":0, "exp": 15}
+    ghost = {"adjective": "","name":"Ghost","health":[1,8],"attack": 7,"armor":0, "exp": 5}
+    ogre = {"adjective": "","name":"Ogre","health":[20,60],"attack": 25,"armor":10, "exp": 75}
     enemy = random.choice([skeleton, ghoul, boar, spider, ghost, ogre])
 
     enemy_adjectives = ["Mighty", "Fearless", "Powerful", "Deadly", "Ferocious", "Horrifying", "Frightening", "Spooky", "Ghostly"]

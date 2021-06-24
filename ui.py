@@ -32,8 +32,10 @@ def display_dark_board(board,player):
     print("\n")
     for i in range(len(board)):
         for j in range(len(board[0])):
-            if j > player["player_location"][1]-torch_range and j <player["player_location"][1]+ torch_range and i > player["player_location"][0] - torch_range and i < player["player_location"][0] + torch_range or board[i][j]=="O":
-                if board[i][j] != " ":
+            if j > player["player_location"][1]-torch_range and j <player["player_location"][1]+ torch_range and i > player["player_location"][0] - torch_range and i < player["player_location"][0] + torch_range:
+                if board[i][j] =="O":
+                    print(" ",end="")
+                elif board[i][j] != " ":
                     print(board[i][j],end="")
                 else:
                     print(".",end="")
