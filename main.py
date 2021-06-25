@@ -80,7 +80,9 @@ def main():
         engine.put_boss_on_board(boards[BOSS_LEVEL],BOSS_ICON)
         if option == "load_game":
             player = {}
-            engine.load_game(player, boards, board_level, escaped_cave)
+            was_load_successful = engine.load_game(player, boards, board_level, escaped_cave)
+            if not was_load_successful:
+                return main()
         if sound_on == [1]:
             winsound.PlaySound("sounds/first_map.wav",winsound.SND_ASYNC)
 

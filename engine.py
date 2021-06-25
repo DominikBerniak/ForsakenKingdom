@@ -89,11 +89,13 @@ def load_game(player, boards, board_level,escaped_cave):
         boards[:] = saved_games.boards
         board_level[0] = saved_games.board_level
         escaped_cave[0] = saved_games.escaped_cave[0]
+        return True
     except:
         util.clear_screen()
         ui.display_error_message("There are no saved games".center(119),3,0)
         util.press_any_button(2,0,True)
         util.clear_screen()
+        return False
 
 def cheats(lumos_on):
     util.clear_screen()
@@ -209,15 +211,15 @@ def put_door_on_board(boards,door_icon):
 
     for i in range(len(boards)):
         if i == 0:
-            boards[0][enter_door_row][enter_door_col] = " "#door_icon
+            boards[0][enter_door_row][enter_door_col] = door_icon
         elif i == 1:
-            boards[1][0][58] = " " #door_icon
+            boards[1][0][58] = door_icon
             exit_door_row, exit_door_col = get_next_level_old_door_location(boards[0], enter_door_row, enter_door_col)
             boards[1][exit_door_row][exit_door_col] = "O" #open door
         elif i == 2:
             enter_door_row = 0
             enter_door_col = 58
-            boards[2][enter_door_row][enter_door_col] = " "#door_icon
+            boards[2][enter_door_row][enter_door_col] = door_icon
             exit_door_row = 31
             exit_door_col = 58
             boards[2][exit_door_row][exit_door_col] = "O"
@@ -354,11 +356,12 @@ def create_item(is_shop=False):
     return item_stats
 
 def authors():
-    crew = ["Dawid Kuropka     : Full-Stack Developer",
-        "Kewin Gregorczyk  : Full-Stack Developer",
-        "Kordian Płusa     : Full-Stack Developer",
-        "Jakub Młocek      : Full-Stack Developer",
-        "Dominik Berniak   : Full-Stack Developer"]
+    crew = [
+        "Kordian Płusa     : Full-Stack Developer          ",
+        "Kewin Gregorczyk  : Back-end Developer | Audio    ",
+        "Dawid Kuropka     : Back-end Developer | Marketing",
+        "Jakub Młocek      : Back-end Leader    | Story    ",
+        "Dominik Berniak   : Front-end Leader   | Back-end "]
     x = 0
     i = 0
     while x in range(len(crew)*2):
@@ -406,26 +409,23 @@ Objective:
 The main goal is to defeat the final boss,
 but before you get to this stage, you have to kill a lot of enemies.
 During your adventure you will meet shop npcs with whom you can trade.
-You will also meet quest npcs who will give you tasks to do.
+You will also meet quest npcs who will give you riddles to solve.
 Legend:
-@ - you
-X - gate
-$ - shop
-? - quest
-T - monster
-& - items 
-% - treasure
+@ - You         X - Gate
+$ - Shop        ? - Quest
+T - Monster     & - Item 
+% - Treasure
 """
     
     information = information.split("\n")
     longest_row_lenght = len(max(information,key=len))
     for i in range(len(information)):
         filler = (longest_row_lenght-len(information[i]))*" "
-        if i != 0 and i !=3:
+        if i != 0 and i !=3 and i!=8:
             ui.display_message(f"{information[i]}{filler}".center(119),1,0)
         else:
-            ui.display_message(f"{information[i]}{filler}".center(119),4,0)
-    util.press_any_button(4,0,True)
+            ui.display_message(f"{information[i]}{filler}".center(119),3,0)
+    util.press_any_button(1,0,True)
     util.clear_screen()
 
 def hall_of_fame(mode,player_level=0, current_exp = 0, player_name=""):
